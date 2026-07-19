@@ -1,0 +1,9 @@
+base: ../pir_sbfr.yaml
+model:
+  lambda_scale: 0.0
+  lambda_consistency: 0.0
+  router:
+    physical_fields: [0.0, 1.0, 0.0]
+    use_physical: true
+    use_visual: false
+    p5_bypass: true

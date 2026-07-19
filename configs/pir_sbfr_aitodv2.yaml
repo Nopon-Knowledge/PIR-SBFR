@@ -1,0 +1,3 @@
+base: pir_sbfr.yaml
+model:
+  scale_mode: aitodv2

@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">PIR-SBFR architecture</title>
+  <desc id="desc">Image features and acquisition metadata are combined by visual and physical routing before multi-scale detection.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071426"/>
+      <stop offset="0.55" stop-color="#10213d"/>
+      <stop offset="1" stop-color="#16142f"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2b74ff"/>
+      <stop offset="1" stop-color="#28b8e6"/>
+    </linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c56ff"/>
+      <stop offset="1" stop-color="#c357ff"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff9b42"/>
+      <stop offset="1" stop-color="#ffd166"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+    <marker id="arrowBlue" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#52c7ff"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#ffc45c"/>
+    </marker>
+    <marker id="arrowWhite" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#d8e8ff"/>
+    </marker>
+  </defs>
+
+  <rect width="1600" height="900" rx="28" fill="url(#bg)"/>
+  <circle cx="1350" cy="100" r="230" fill="#6e49ff" opacity="0.09"/>
+  <circle cx="180" cy="800" r="260" fill="#1da6e8" opacity="0.08"/>
+
+  <text x="80" y="86" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="44" font-weight="700">PIR-SBFR Architecture</text>
+  <text x="80" y="126" fill="#9cb4d8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22">Physical reliability and visual evidence jointly route the feature pyramid.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="75" y="210" width="210" height="150" rx="24" fill="#142a4d" stroke="#3f8cff" stroke-width="2"/>
+    <rect x="95" y="232" width="170" height="72" rx="12" fill="url(#blue)" opacity="0.9"/>
+    <path d="M120 287 L157 254 L185 276 L213 244 L248 287 Z" fill="#e9f7ff" opacity="0.88"/>
+    <circle cx="226" cy="253" r="10" fill="#fff4b5"/>
+    <text x="180" y="337" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21" font-weight="600">Optical image</text>
+  </g>
+
+  <path d="M285 285 H350" fill="none" stroke="#52c7ff" stroke-width="4" marker-end="url(#arrowBlue)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="365" y="200" width="270" height="170" rx="24" fill="#132e52" stroke="#4e9eff" stroke-width="2"/>
+    <text x="500" y="247" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="700">Backbone + DRFB</text>
+    <text x="500" y="280" text-anchor="middle" fill="#a8c7ec" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18">YOLO11n-style encoder</text>
+    <rect x="407" y="313" width="52" height="30" rx="7" fill="#43c3ff"/>
+    <rect x="474" y="305" width="52" height="38" rx="7" fill="#4596ff"/>
+    <rect x="541" y="295" width="52" height="48" rx="7" fill="#7069ff"/>
+    <text x="433" y="333" text-anchor="middle" fill="#06172a" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700">P3</text>
+    <text x="500" y="330" text-anchor="middle" fill="#06172a" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700">P4</text>
+    <text x="567" y="324" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" font-weight="700">P5</text>
+  </g>
+
+  <path d="M635 285 H720" fill="none" stroke="#52c7ff" stroke-width="4" marker-end="url(#arrowBlue)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="735" y="185" width="275" height="200" rx="24" fill="#27234f" stroke="#a37aff" stroke-width="2"/>
+    <text x="872" y="232" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="700">Visual residual router</text>
+    <text x="872" y="264" text-anchor="middle" fill="#c7b8f7" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18">Global P3/P4/P5 evidence</text>
+    <g>
+      <rect x="779" y="294" width="38" height="44" rx="8" fill="#7a5bff"/>
+      <rect x="829" y="294" width="38" height="44" rx="8" fill="#945cff"/>
+      <rect x="879" y="294" width="38" height="44" rx="8" fill="#ad5cff"/>
+      <rect x="929" y="294" width="38" height="44" rx="8" fill="#c65cff"/>
+      <text x="798" y="322" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14">T1</text>
+      <text x="848" y="322" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14">T2</text>
+      <text x="898" y="322" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14">T3</text>
+      <text x="948" y="322" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14">T4</text>
+    </g>
+    <text x="872" y="366" text-anchor="middle" fill="#eadfff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" font-weight="600">bounded Δvis</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="75" y="550" width="260" height="185" rx="24" fill="#3d2a16" stroke="#ffb759" stroke-width="2"/>
+    <text x="205" y="597" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="700">Acquisition metadata</text>
+    <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" font-weight="600">
+      <rect x="108" y="625" width="58" height="42" rx="10" fill="#ff9b42"/><text x="137" y="652" text-anchor="middle" fill="#2c1706">GSD</text>
+      <rect x="176" y="625" width="58" height="42" rx="10" fill="#ffb74d"/><text x="205" y="652" text-anchor="middle" fill="#2c1706">MTF</text>
+      <rect x="244" y="625" width="58" height="42" rx="10" fill="#ffd166"/><text x="273" y="652" text-anchor="middle" fill="#2c1706">SNR</text>
+    </g>
+    <text x="205" y="704" text-anchor="middle" fill="#e9c898" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">+ field availability mask</text>
+  </g>
+
+  <path d="M335 642 H430" fill="none" stroke="#ffc45c" stroke-width="4" marker-end="url(#arrowAmber)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="445" y="545" width="300" height="195" rx="24" fill="#3b2d1b" stroke="#ffc45c" stroke-width="2"/>
+    <text x="595" y="593" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="700">Physical reliability prior</text>
+    <text x="595" y="628" text-anchor="middle" fill="#f3c985" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18">parameter-free analytic mapping</text>
+    <text x="595" y="676" text-anchor="middle" fill="#fff3d4" font-family="Georgia,serif" font-size="24">ρphy = exp(−dKᵀ)</text>
+    <text x="595" y="713" text-anchor="middle" fill="#d9b879" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">safe under missing descriptors</text>
+  </g>
+
+  <path d="M745 642 H825 V455 H865" fill="none" stroke="#ffc45c" stroke-width="4" marker-end="url(#arrowAmber)"/>
+  <path d="M872 385 V438" fill="none" stroke="#bb8cff" stroke-width="4" marker-end="url(#arrowWhite)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="735" y="450" width="375" height="165" rx="24" fill="#1e2949" stroke="#d5dfff" stroke-width="2"/>
+    <text x="922" y="497" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="23" font-weight="700">Reliability-guided scale routing</text>
+    <text x="922" y="540" text-anchor="middle" fill="#d8e4ff" font-family="Georgia,serif" font-size="25">w = softmax((Δvis + η log ρphy) / τ)</text>
+    <text x="922" y="579" text-anchor="middle" fill="#9db1d8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">normalized weights for P3 · P4 · P5</text>
+  </g>
+
+  <path d="M1110 532 H1170" fill="none" stroke="#d8e8ff" stroke-width="4" marker-end="url(#arrowWhite)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="1185" y="205" width="335" height="420" rx="28" fill="#112b3d" stroke="#46d6c6" stroke-width="2"/>
+    <text x="1352" y="256" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="25" font-weight="700">Multi-scale detection</text>
+    <rect x="1230" y="292" width="245" height="66" rx="16" fill="#173f50" stroke="#45c9c0"/>
+    <text x="1352" y="320" text-anchor="middle" fill="#e9fffc" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="19" font-weight="600">3wi · Pi reweighting</text>
+    <text x="1352" y="344" text-anchor="middle" fill="#92d8d2" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">+ unweighted P5 bypass</text>
+    <path d="M1352 358 V385" stroke="#79e5d9" stroke-width="3" marker-end="url(#arrowWhite)"/>
+    <rect x="1230" y="398" width="245" height="58" rx="16" fill="#1a4b58" stroke="#45c9c0"/>
+    <text x="1352" y="434" text-anchor="middle" fill="#e9fffc" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" font-weight="600">FPN-PAN + FACH</text>
+    <path d="M1352 456 V483" stroke="#79e5d9" stroke-width="3" marker-end="url(#arrowWhite)"/>
+    <rect x="1230" y="496" width="245" height="82" rx="16" fill="url(#blue)" opacity="0.88"/>
+    <text x="1352" y="528" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20" font-weight="700">YOLO11 Detect</text>
+    <text x="1352" y="555" text-anchor="middle" fill="#e4f8ff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">DFL · TaskAligned · NMS</text>
+  </g>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">
+    <rect x="82" y="815" width="18" height="18" rx="4" fill="#43b5ff"/><text x="112" y="830" fill="#a9c7eb">image feature path</text>
+    <rect x="300" y="815" width="18" height="18" rx="4" fill="#ffc45c"/><text x="330" y="830" fill="#d9c39f">physical metadata path</text>
+    <rect x="560" y="815" width="18" height="18" rx="4" fill="#a875ff"/><text x="590" y="830" fill="#cbb7ef">learned visual routing</text>
+    <text x="1515" y="832" text-anchor="end" fill="#7087ac">Independent reproduction · not official author code</text>
+  </g>
+</svg>

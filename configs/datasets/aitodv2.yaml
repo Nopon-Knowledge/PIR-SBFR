@@ -1,0 +1,16 @@
+# Static convenience config for the default preparation destination.
+# The converter-generated dataset.yaml/category_mapping.json are authoritative if
+# a particular AI-TOD-v2 mirror uses nonstandard category ids or names.
+# With no path key, Ultralytics resolves these entries relative to this YAML file.
+train: ../../datasets/AI-TOD-v2/images/train
+val: ../../datasets/AI-TOD-v2/images/val
+test: ../../datasets/AI-TOD-v2/images/test
+names:
+  - airplane
+  - bridge
+  - storage-tank
+  - ship
+  - swimming-pool
+  - vehicle
+  - person
+  - wind-mill

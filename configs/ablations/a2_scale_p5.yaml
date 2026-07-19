@@ -1,0 +1,10 @@
+base: ../pir_sbfr.yaml
+model:
+  lambda_scale: 0.1
+  lambda_consistency: 0.0
+  router:
+    use_physical: false
+    use_visual: true
+    p5_bypass: true
+degradation:
+  enabled: false

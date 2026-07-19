@@ -1,0 +1,5 @@
+# Placeholder consumed by Ultralytics' trainer path resolver. PIRTrainer builds
+# the Python model directly so metadata can enter the forward signature.
+nc: 20
+backbone: []
+head: []

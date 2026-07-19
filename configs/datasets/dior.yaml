@@ -1,0 +1,27 @@
+# Static convenience config for the default preparation destination.
+# The converter also writes an absolute-path dataset.yaml into its --output directory.
+# With no path key, Ultralytics resolves these entries relative to this YAML file.
+train: ../../datasets/DIOR/images/train
+val: ../../datasets/DIOR/images/val
+test: ../../datasets/DIOR/images/test
+names:
+  - airplane
+  - airport
+  - baseballfield
+  - basketballcourt
+  - bridge
+  - chimney
+  - dam
+  - Expressway-Service-area
+  - Expressway-toll-station
+  - golffield
+  - groundtrackfield
+  - harbor
+  - overpass
+  - ship
+  - stadium
+  - storagetank
+  - tenniscourt
+  - trainstation
+  - vehicle
+  - windmill

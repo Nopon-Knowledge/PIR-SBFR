@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760" role="img" aria-labelledby="title desc">
+  <title id="title">PIR-SBFR reproducibility and experiment suite</title>
+  <desc id="desc">One checkpoint and prepared dataset feed standard evaluation, robustness grids, out-of-distribution degradations, metadata controls, statistics, and efficiency benchmarks.</desc>
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#071526"/><stop offset="1" stop-color="#151832"/></linearGradient>
+    <linearGradient id="hub" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3b8cff"/><stop offset="1" stop-color="#7a57ff"/></linearGradient>
+    <filter id="s3" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.35"/></filter>
+    <marker id="a3" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto"><path d="M0 0L11 5.5 0 11Z" fill="#8da9d6"/></marker>
+  </defs>
+  <rect width="1600" height="760" rx="28" fill="url(#bg3)"/>
+  <circle cx="170" cy="60" r="220" fill="#188ed8" opacity="0.07"/>
+  <circle cx="1450" cy="700" r="280" fill="#a64ed9" opacity="0.07"/>
+  <text x="78" y="80" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" font-weight="700">Reproducibility &amp; Experiment Suite</text>
+  <text x="78" y="120" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21">From a trained checkpoint to paper-aligned metrics, stress tests, uncertainty, and deployment measurements.</text>
+
+  <g filter="url(#s3)">
+    <rect x="70" y="250" width="260" height="255" rx="25" fill="#142841" stroke="#547ba9" stroke-width="2"/>
+    <text x="200" y="296" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="23" font-weight="700">Inputs</text>
+    <rect x="103" y="326" width="194" height="45" rx="12" fill="#1d3c5d"/><text x="200" y="355" text-anchor="middle" fill="#d9edff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">best.pt checkpoint</text>
+    <rect x="103" y="385" width="194" height="45" rx="12" fill="#1d3c5d"/><text x="200" y="414" text-anchor="middle" fill="#d9edff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">COCO GT + images</text>
+    <rect x="103" y="444" width="194" height="37" rx="12" fill="#1d3c5d"/><text x="200" y="469" text-anchor="middle" fill="#9fc2e4" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">metadata (optional)</text>
+  </g>
+
+  <path d="M330 378H405" fill="none" stroke="#8da9d6" stroke-width="4" marker-end="url(#a3)"/>
+
+  <g filter="url(#s3)">
+    <rect x="420" y="235" width="290" height="285" rx="28" fill="url(#hub)" opacity="0.9"/>
+    <text x="565" y="285" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="25" font-weight="700">Shared inference core</text>
+    <text x="565" y="322" text-anchor="middle" fill="#e6f1ff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">batched metadata-aware forward</text>
+    <rect x="470" y="355" width="190" height="45" rx="13" fill="#2f54b5" opacity="0.8"/><text x="565" y="384" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">letterbox + restore</text>
+    <rect x="470" y="415" width="190" height="45" rx="13" fill="#513caf" opacity="0.8"/><text x="565" y="444" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">COCO serialization</text>
+    <text x="565" y="493" text-anchor="middle" fill="#d5ddff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">fixed confidence / IoU protocol</text>
+  </g>
+
+  <path d="M710 300H782V199H840" fill="none" stroke="#8da9d6" stroke-width="3" marker-end="url(#a3)"/>
+  <path d="M710 345H810" fill="none" stroke="#8da9d6" stroke-width="3" marker-end="url(#a3)"/>
+  <path d="M710 410H782V506H840" fill="none" stroke="#8da9d6" stroke-width="3" marker-end="url(#a3)"/>
+
+  <g filter="url(#s3)">
+    <rect x="855" y="155" width="290" height="130" rx="22" fill="#123b4e" stroke="#3bc6d9" stroke-width="2"/>
+    <text x="1000" y="199" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" font-weight="700">Paper-aligned COCO</text>
+    <text x="1000" y="232" text-anchor="middle" fill="#9ee6ed" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">DIOR / AI-TOD-v2 scale bins</text>
+    <text x="1000" y="258" text-anchor="middle" fill="#72b6c0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">AP · AP50 · AP75 · AR</text>
+  </g>
+
+  <g filter="url(#s3)">
+    <rect x="825" y="305" width="340" height="150" rx="22" fill="#3b2e18" stroke="#f0b84d" stroke-width="2"/>
+    <text x="995" y="348" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" font-weight="700">Robustness &amp; controls</text>
+    <text x="995" y="383" text-anchor="middle" fill="#f7d895" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">27-cell GSD × MTF × SNR grid</text>
+    <text x="995" y="411" text-anchor="middle" fill="#f7d895" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">9 OOD conditions · metadata controls</text>
+    <text x="995" y="437" text-anchor="middle" fill="#bd9c5f" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14">approximations labeled in outputs</text>
+  </g>
+
+  <g filter="url(#s3)">
+    <rect x="855" y="480" width="290" height="130" rx="22" fill="#34244d" stroke="#aa75e9" stroke-width="2"/>
+    <text x="1000" y="523" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" font-weight="700">Routing diagnostics</text>
+    <text x="1000" y="556" text-anchor="middle" fill="#d9bdf4" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">weights · ρphy · scale estimate</text>
+    <text x="1000" y="583" text-anchor="middle" fill="#a78cc1" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14">JSON and CSV probes</text>
+  </g>
+
+  <path d="M1145 220H1230V300" fill="none" stroke="#8da9d6" stroke-width="3" marker-end="url(#a3)"/>
+  <path d="M1165 380H1230" fill="none" stroke="#8da9d6" stroke-width="3" marker-end="url(#a3)"/>
+  <path d="M1145 545H1230V461" fill="none" stroke="#8da9d6" stroke-width="3" marker-end="url(#a3)"/>
+
+  <g filter="url(#s3)">
+    <rect x="1245" y="235" width="285" height="285" rx="28" fill="#202b48" stroke="#778ed4" stroke-width="2"/>
+    <text x="1387" y="284" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="700">Report artifacts</text>
+    <rect x="1284" y="317" width="207" height="43" rx="12" fill="#2a3d68"/><text x="1387" y="345" text-anchor="middle" fill="#dce7ff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">metrics + predictions</text>
+    <rect x="1284" y="374" width="207" height="43" rx="12" fill="#2a3d68"/><text x="1387" y="402" text-anchor="middle" fill="#dce7ff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">paired bootstrap CI</text>
+    <rect x="1284" y="431" width="207" height="43" rx="12" fill="#2a3d68"/><text x="1387" y="459" text-anchor="middle" fill="#dce7ff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">3-seed mean ± SD</text>
+    <text x="1387" y="500" text-anchor="middle" fill="#8fa4d1" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14">+ FP16 latency benchmark</text>
+  </g>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" fill="#7189ad">
+    <text x="78" y="690">Every generated result records conditions, seeds, and approximation flags.</text>
+    <text x="1520" y="690" text-anchor="end">Designed for auditable reproduction, not hidden defaults.</text>
+  </g>
+</svg>
