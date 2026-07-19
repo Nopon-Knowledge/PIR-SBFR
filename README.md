@@ -8,11 +8,11 @@ An independent, end-to-end reproduction of **PIR-SBFR** for robust object detect
 ![Tests](https://img.shields.io/badge/tests-23%20passed-2EA44F)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-**[Source paper](template.pdf) · [Paper-to-code specification](docs/PAPER_SPEC.md) · [Reproduction protocol](REPRODUCIBILITY.md)**
+**[Paper-to-code specification](docs/PAPER_SPEC.md) · [Reproduction protocol](REPRODUCIBILITY.md)**
 
 ![PIR-SBFR architecture](docs/assets/pir-sbfr-architecture.svg)
 
-This repository implements the model, paired-degradation training procedure, complete loss, DIOR and AI-TOD-v2 data conversion, paper-specific COCO evaluation, robustness experiments, metadata controls, statistical analysis, and deployment-oriented efficiency benchmarks described in [`template.pdf`](template.pdf).
+This repository implements the model, paired-degradation training procedure, complete loss, DIOR and AI-TOD-v2 data conversion, paper-specific COCO evaluation, robustness experiments, metadata controls, statistical analysis, and deployment-oriented efficiency benchmarks described in the original PIR-SBFR paper. The paper PDF is not redistributed in this repository.
 
 > [!IMPORTANT]
 > The paper does not release official source code, pretrained weights, a complete network YAML, all internal DRFB/FACH/visual-expert parameters, the flight dataset, or sample-level settings for every out-of-distribution degradation. This repository is therefore a **high-fidelity independent reproduction**, not a claim of recovering the authors' private implementation. Every paper-grounded decision, calibrated choice, and non-identifiable detail is documented in [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md).
@@ -570,7 +570,6 @@ PIR-SBFR/
 │   └── inference.py
 ├── tests/                     Unit and integration smoke tests
 ├── REPRODUCIBILITY.md         End-to-end reproduction manual
-├── template.pdf               Source paper
 └── pyproject.toml             Package metadata, dependencies, and CLI entry points
 ```
 
@@ -638,6 +637,6 @@ The package metadata in [`pyproject.toml`](pyproject.toml) declares the reproduc
 
 If this reproduction supports your research:
 
-1. cite Zizheng Zhao, Jingchao Liu, Zixin Wang, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *PIR-SBFR: Physical Imaging Reliability-Guided Scale-Biased Feature Reweighting for Robust Object Detection in Optical Remote Sensing Imagery* ([`template.pdf`](template.pdf));
+1. cite Zizheng Zhao, Jingchao Liu, Zixin Wang, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *PIR-SBFR: Physical Imaging Reliability-Guided Scale-Biased Feature Reweighting for Robust Object Detection in Optical Remote Sensing Imagery*;
 2. identify this repository as an independent reproduction;
 3. include the exact Git commit, configuration, dataset split, and training seeds used.

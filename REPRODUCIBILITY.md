@@ -6,7 +6,7 @@ This document provides a complete execution path from public-data preparation an
 
 Interpret results and experiment records using three distinct categories:
 
-- **Paper-fixed setting:** a formula, value, data split, or test procedure explicitly specified in `template.pdf`.
+- **Paper-fixed setting:** a formula, value, data split, or test procedure explicitly specified in the original PIR-SBFR paper.
 - **Implementation choice:** a concrete choice required for a runnable model but not disclosed by the paper.
 - **Not exactly reproducible:** an item that lacks public data, sample-level parameters, or original code and therefore cannot be matched at the pixel or parameter level.
 
