@@ -1,6 +1,6 @@
 # PIR-SBFR Paper Specification and Implementation Mapping
 
-This document treats the repository-root `template.pdf` as the sole paper specification. It records each equation, figure connection, paper-fixed value, current code location, and undisclosed detail. It is not a speculative completion of the authors' private implementation.
+This document treats the original PIR-SBFR paper as the sole research specification. The paper PDF is not redistributed in this repository. This document records each equation, figure connection, paper-fixed value, current code location, and undisclosed detail; it is not a speculative completion of the authors' private implementation.
 
 ## 1. Reproducibility conclusions
 

@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Paper-reported cross-dataset accuracy and efficiency results</title>
+  <desc id="desc">Grouped bars compare YOLOv11n, YOLO-DSF, and PIR-SBFR on DIOR and AI-TOD-v2. A scatter plot shows DIOR AP versus GFLOPs for four efficiency-tested variants.</desc>
+  <defs>
+    <linearGradient id="paperBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071526"/>
+      <stop offset="1" stop-color="#171632"/>
+    </linearGradient>
+    <filter id="paperShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="900" rx="28" fill="url(#paperBg)"/>
+  <circle cx="1450" cy="80" r="230" fill="#7957ff" opacity="0.08"/>
+  <text x="70" y="72" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" font-weight="700">Paper-reported results</text>
+  <text x="70" y="111" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Three-seed means from paper Tables 5, 6, and 15. Higher AP is better.</text>
+
+  <g filter="url(#paperShadow)">
+    <rect x="55" y="145" width="780" height="675" rx="24" fill="#101f37" stroke="#294563" stroke-width="2"/>
+  </g>
+  <text x="90" y="192" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="25" font-weight="700">Cross-dataset accuracy</text>
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">
+    <rect x="355" y="171" width="17" height="17" rx="3" fill="#667f9f"/><text x="382" y="185" fill="#b7c8df">YOLOv11n</text>
+    <rect x="485" y="171" width="17" height="17" rx="3" fill="#3974b9"/><text x="512" y="185" fill="#b7c8df">YOLO-DSF</text>
+    <rect x="620" y="171" width="17" height="17" rx="3" fill="#21b6a6"/><text x="647" y="185" fill="#b7c8df">PIR-SBFR Full</text>
+  </g>
+
+  <g stroke="#29415f" stroke-width="1">
+    <line x1="105" y1="720" x2="805" y2="720"/>
+    <line x1="105" y1="584" x2="805" y2="584"/>
+    <line x1="105" y1="448" x2="805" y2="448"/>
+    <line x1="105" y1="312" x2="805" y2="312"/>
+    <line x1="105" y1="244" x2="805" y2="244"/>
+  </g>
+  <g fill="#8197b8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" text-anchor="end">
+    <text x="94" y="725">0</text><text x="94" y="589">20</text><text x="94" y="453">40</text><text x="94" y="317">60</text><text x="94" y="249">70</text>
+  </g>
+  <text x="77" y="500" transform="rotate(-90 77 500)" text-anchor="middle" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">Average precision (%)</text>
+
+  <g>
+    <rect x="166" y="330.3" width="34" height="389.7" rx="5" fill="#667f9f"/>
+    <rect x="208" y="291.7" width="34" height="428.3" rx="5" fill="#3974b9"/>
+    <rect x="250" y="274.5" width="34" height="445.5" rx="5" fill="#21b6a6"/>
+    <rect x="346" y="457.2" width="34" height="262.8" rx="5" fill="#667f9f"/>
+    <rect x="388" y="420.3" width="34" height="299.7" rx="5" fill="#3974b9"/>
+    <rect x="430" y="396.3" width="34" height="323.7" rx="5" fill="#21b6a6"/>
+    <rect x="526" y="544.4" width="34" height="175.6" rx="5" fill="#667f9f"/>
+    <rect x="568" y="518.7" width="34" height="201.3" rx="5" fill="#3974b9"/>
+    <rect x="610" y="501.5" width="34" height="218.5" rx="5" fill="#21b6a6"/>
+    <rect x="686" y="646.3" width="34" height="73.7" rx="5" fill="#667f9f"/>
+    <rect x="728" y="620.6" width="34" height="99.4" rx="5" fill="#3974b9"/>
+    <rect x="770" y="602.9" width="34" height="117.1" rx="5" fill="#21b6a6"/>
+  </g>
+  <g fill="#dce8f8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" text-anchor="middle">
+    <text x="183" y="320">57.31</text><text x="225" y="282">62.98</text><text x="267" y="265">65.52</text>
+    <text x="363" y="447">38.64</text><text x="405" y="410">44.08</text><text x="447" y="386">47.61</text>
+    <text x="543" y="534">25.82</text><text x="585" y="509">29.61</text><text x="627" y="491">32.13</text>
+    <text x="703" y="636">10.84</text><text x="745" y="611">14.62</text><text x="787" y="593">17.22</text>
+  </g>
+  <g fill="#b7c8df" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" text-anchor="middle">
+    <text x="225" y="753">DIOR</text><text x="225" y="775">AP</text>
+    <text x="405" y="753">DIOR</text><text x="405" y="775">AP small</text>
+    <text x="585" y="753">AI-TOD-v2</text><text x="585" y="775">AP</text>
+    <text x="745" y="753">AI-TOD-v2</text><text x="745" y="775">AP very-tiny</text>
+  </g>
+
+  <g filter="url(#paperShadow)">
+    <rect x="865" y="145" width="680" height="675" rx="24" fill="#101f37" stroke="#294563" stroke-width="2"/>
+  </g>
+  <text x="900" y="192" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="25" font-weight="700">Accuracy-computation trade-off</text>
+  <text x="900" y="221" fill="#8ca4c6" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">DIOR AP versus GFLOPs at 640 x 640</text>
+  <g stroke="#29415f" stroke-width="1">
+    <line x1="950" y1="720" x2="1500" y2="720"/>
+    <line x1="950" y1="626" x2="1500" y2="626"/>
+    <line x1="950" y1="532" x2="1500" y2="532"/>
+    <line x1="950" y1="438" x2="1500" y2="438"/>
+    <line x1="950" y1="344" x2="1500" y2="344"/>
+    <line x1="950" y1="250" x2="1500" y2="250"/>
+    <line x1="1009" y1="250" x2="1009" y2="720"/>
+    <line x1="1107" y1="250" x2="1107" y2="720"/>
+    <line x1="1205" y1="250" x2="1205" y2="720"/>
+    <line x1="1304" y1="250" x2="1304" y2="720"/>
+    <line x1="1402" y1="250" x2="1402" y2="720"/>
+    <line x1="1500" y1="250" x2="1500" y2="720"/>
+  </g>
+  <g fill="#8197b8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14">
+    <text x="938" y="725" text-anchor="end">56</text><text x="938" y="631" text-anchor="end">58</text><text x="938" y="537" text-anchor="end">60</text><text x="938" y="443" text-anchor="end">62</text><text x="938" y="349" text-anchor="end">64</text><text x="938" y="255" text-anchor="end">66</text>
+    <text x="1009" y="746" text-anchor="middle">6.5</text><text x="1107" y="746" text-anchor="middle">7.0</text><text x="1205" y="746" text-anchor="middle">7.5</text><text x="1304" y="746" text-anchor="middle">8.0</text><text x="1402" y="746" text-anchor="middle">8.5</text><text x="1500" y="746" text-anchor="middle">9.0</text>
+  </g>
+  <text x="1225" y="784" text-anchor="middle" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">GFLOPs per image</text>
+  <text x="902" y="485" transform="rotate(-90 902 485)" text-anchor="middle" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">DIOR AP (%)</text>
+  <polyline points="1003,658 1388,392 1404,359 1465,273" fill="none" stroke="#7298c9" stroke-width="3" opacity="0.7"/>
+  <circle cx="1003" cy="658" r="8" fill="#667f9f"/>
+  <circle cx="1388" cy="392" r="9" fill="#3974b9"/>
+  <circle cx="1404" cy="359" r="8" fill="#7895b7"/>
+  <circle cx="1465" cy="273" r="11" fill="#21b6a6"/>
+  <g font-family="Inter,Segoe UI,Arial,sans-serif">
+    <text x="1016" y="686" fill="#c9d8eb" font-size="15">YOLOv11n</text>
+    <path d="M1275 425 L1378 397" stroke="#6f8daf" stroke-width="2"/>
+    <text x="1115" y="432" fill="#c9d8eb" font-size="15">YOLO-DSF</text>
+    <path d="M1288 337 L1394 357" stroke="#6f8daf" stroke-width="2"/>
+    <text x="1085" y="337" fill="#c9d8eb" font-size="15">Scale supervision + P5 bypass</text>
+    <path d="M1390 245 L1456 269" stroke="#61cfc1" stroke-width="2"/>
+    <text x="1270" y="239" fill="#e6fffb" font-size="16" font-weight="700">PIR-SBFR Full</text>
+    <text x="1270" y="266" fill="#62d8c9" font-size="15">65.52 AP at 8.82 GFLOPs</text>
+  </g>
+  <text x="70" y="862" fill="#7189ad" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">Values are reported by the paper and are not measurements from the random-initialized repository model.</text>
+</svg>
