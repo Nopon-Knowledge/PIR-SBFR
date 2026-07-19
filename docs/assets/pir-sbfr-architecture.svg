@@ -95,21 +95,22 @@
   <path d="M335 642 H430" fill="none" stroke="#ffc45c" stroke-width="4" marker-end="url(#arrowAmber)"/>
 
   <g filter="url(#shadow)">
-    <rect x="445" y="545" width="300" height="195" rx="24" fill="#3b2d1b" stroke="#ffc45c" stroke-width="2"/>
-    <text x="595" y="593" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" font-weight="700">Physical reliability prior</text>
-    <text x="595" y="628" text-anchor="middle" fill="#f3c985" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18">parameter-free analytic mapping</text>
-    <text x="595" y="676" text-anchor="middle" fill="#fff3d4" font-family="Georgia,serif" font-size="24">ρphy = exp(−dKᵀ)</text>
-    <text x="595" y="713" text-anchor="middle" fill="#d9b879" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">safe under missing descriptors</text>
+    <rect x="445" y="545" width="280" height="195" rx="24" fill="#3b2d1b" stroke="#ffc45c" stroke-width="2"/>
+    <text x="585" y="593" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="23" font-weight="700">Physical reliability prior</text>
+    <text x="585" y="628" text-anchor="middle" fill="#f3c985" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">parameter-free analytic mapping</text>
+    <text x="585" y="676" text-anchor="middle" fill="#fff3d4" font-family="Georgia,serif" font-size="23">rho = exp(-d K^T)</text>
+    <text x="585" y="713" text-anchor="middle" fill="#d9b879" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">safe under missing descriptors</text>
   </g>
 
-  <path d="M745 642 H825 V455 H865" fill="none" stroke="#ffc45c" stroke-width="4" marker-end="url(#arrowAmber)"/>
+  <path d="M725 642 H825 V455 H865" fill="none" stroke="#ffc45c" stroke-width="4" marker-end="url(#arrowAmber)"/>
   <path d="M872 385 V438" fill="none" stroke="#bb8cff" stroke-width="4" marker-end="url(#arrowWhite)"/>
 
   <g filter="url(#shadow)">
     <rect x="735" y="450" width="375" height="165" rx="24" fill="#1e2949" stroke="#d5dfff" stroke-width="2"/>
     <text x="922" y="497" text-anchor="middle" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="23" font-weight="700">Reliability-guided scale routing</text>
-    <text x="922" y="540" text-anchor="middle" fill="#d8e4ff" font-family="Georgia,serif" font-size="25">w = softmax((Δvis + η log ρphy) / τ)</text>
-    <text x="922" y="579" text-anchor="middle" fill="#9db1d8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">normalized weights for P3 · P4 · P5</text>
+    <text x="922" y="535" text-anchor="middle" fill="#d8e4ff" font-family="Georgia,serif" font-size="20">z = delta_vis + eta log rho_phy</text>
+    <text x="922" y="562" text-anchor="middle" fill="#d8e4ff" font-family="Georgia,serif" font-size="20">w = softmax(z / tau)</text>
+    <text x="922" y="592" text-anchor="middle" fill="#9db1d8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">normalized weights for P3 · P4 · P5</text>
   </g>
 
   <path d="M1110 532 H1170" fill="none" stroke="#d8e8ff" stroke-width="4" marker-end="url(#arrowWhite)"/>

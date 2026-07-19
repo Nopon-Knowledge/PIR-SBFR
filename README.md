@@ -1,4 +1,4 @@
-# PIR-SBFR: Physics-Informed Reliability-Guided Scale-Biased Feature Reweighting
+# PIR-SBFR: Physical Imaging Reliability-Guided Scale-Biased Feature Reweighting
 
 An independent, end-to-end reproduction of **PIR-SBFR** for robust object detection in degraded optical remote-sensing imagery.
 
@@ -7,6 +7,8 @@ An independent, end-to-end reproduction of **PIR-SBFR** for robust object detect
 ![Ultralytics 8.3.0](https://img.shields.io/badge/Ultralytics-8.3.0-111F68)
 ![Tests](https://img.shields.io/badge/tests-23%20passed-2EA44F)
 ![License](https://img.shields.io/badge/license-MIT-blue)
+
+**[Source paper](template.pdf) · [Paper-to-code specification](docs/PAPER_SPEC.md) · [Reproduction protocol](REPRODUCIBILITY.md)**
 
 ![PIR-SBFR architecture](docs/assets/pir-sbfr-architecture.svg)
 
@@ -18,6 +20,7 @@ This repository implements the model, paired-degradation training procedure, com
 ## Table of contents
 
 - [Reproduction at a glance](#reproduction-at-a-glance)
+- [Paper-reported results](#paper-reported-results)
 - [Method overview](#method-overview)
 - [What is implemented](#what-is-implemented)
 - [Installation](#installation)
@@ -62,6 +65,23 @@ The default `nc=20` model was profiled by passing a real `640×640` tensor throu
 
 This agreement constrains the unreported structural hyperparameters; it does not imply that the paper's hidden architecture is uniquely identifiable.
 
+## Paper-reported results
+
+> [!NOTE]
+> These charts are original redraws of values reported in Tables 5, 6, 11, and 15 and Figure 7 of the paper. They summarize the paper's claims; they are not measurements from the randomly initialized model in this repository. A reproduced accuracy result requires the complete datasets and the documented three-seed training protocol.
+
+![Paper-reported accuracy and efficiency results](docs/assets/paper-results-overview.svg)
+
+On the paper's YOLO-DSF baseline, the full PIR-SBFR model reports:
+
+- **DIOR:** AP rises from 62.98 to 65.52 (+2.54 points), while small-object AP rises from 44.08 to 47.61 (+3.53 points).
+- **AI-TOD-v2:** AP rises from 29.61 to 32.13 (+2.52 points), while very-tiny-object AP rises from 14.62 to 17.22 (+2.60 points).
+- **Compute:** the reported cost rises from 8.43 to 8.82 GFLOPs (+4.63%) at `640 × 640` resolution.
+
+![Paper-reported robustness results](docs/assets/paper-robustness-results.svg)
+
+The robustness study reports positive PIR-SBFR gains in all 27 in-distribution degradation cells and all nine held-out degradation conditions. Across the held-out conditions, mean AP rises from 46.95 to 51.32; under the most difficult joint shift, AP rises from 29.60 to 36.97.
+
 ## Method overview
 
 PIR-SBFR combines two complementary routing signals:
@@ -72,10 +92,10 @@ PIR-SBFR combines two complementary routing signals:
 Their logits are fused before a softmax produces scale weights:
 
 ```math
-\mathbf{w}
-= \operatorname{softmax}\!\left(
-\frac{\Delta_{\mathrm{vis}} + \eta \log \boldsymbol{\rho}_{\mathrm{phy}}}{\tau}
-\right).
+\displaystyle
+\mathbf{w} = \operatorname{softmax}\!\left(
+  \frac{\Delta_{\mathrm{vis}} + \eta \log \mathbf{\rho}_{\mathrm{phy}}}{\tau}
+\right)
 ```
 
 Aligned pyramid features are reweighted as `3w_i · P_i`, processed by FPN-PAN and FACH, and passed to the native YOLO11 detection head. An unweighted P5 bypass preserves coarse structural information when acquisition quality is poor.
@@ -85,7 +105,8 @@ Aligned pyramid features are reweighted as `3w_i · P_i`, processed by FPN-PAN a
 For metadata `m = [GSD, MTF, SNR]`, the implementation first forms non-negative degradation coordinates relative to the reference condition `(1.0, 0.5, 30 dB)`. Reliability is then computed analytically:
 
 ```math
-\boldsymbol{\rho}_{\mathrm{phy}} = \exp(-\mathbf{d}\mathbf{K}^{\mathsf{T}}).
+\displaystyle
+\mathbf{\rho}_{\mathrm{phy}} = \exp\!\left(-\mathbf{d}\mathbf{K}^{\mathsf{T}}\right)
 ```
 
 The prior has no trainable parameters. Missing fields are replaced by safe reference values before nonlinear operations and then removed by their availability mask, preventing invalid placeholders from producing NaNs.
@@ -279,11 +300,11 @@ If `availability` is omitted, it is inferred from the fields present in that rec
 The default optimization objective is:
 
 ```math
-\mathcal{L}
-= \mathcal{L}_{\mathrm{det}}^{\mathrm{clean}}
-+ \mathcal{L}_{\mathrm{det}}^{\mathrm{degraded}}
-+ \lambda_{\mathrm{scale}}\mathcal{L}_{\mathrm{scale}}
-+ \lambda_{\mathrm{cons}}\mathcal{L}_{\mathrm{cons}}.
+\displaystyle
+\mathcal{L} = \mathcal{L}_{\mathrm{det}}^{\mathrm{clean}}
+  + \mathcal{L}_{\mathrm{det}}^{\mathrm{degraded}}
+  + \lambda_{\mathrm{scale}}\mathcal{L}_{\mathrm{scale}}
+  + \lambda_{\mathrm{cons}}\mathcal{L}_{\mathrm{cons}}
 ```
 
 ### One paper seed on DIOR
@@ -617,6 +638,6 @@ The package metadata in [`pyproject.toml`](pyproject.toml) declares the reproduc
 
 If this reproduction supports your research:
 
-1. cite the original paper corresponding to [`template.pdf`](template.pdf);
+1. cite Zizheng Zhao, Jingchao Liu, Zixin Wang, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *PIR-SBFR: Physical Imaging Reliability-Guided Scale-Biased Feature Reweighting for Robust Object Detection in Optical Remote Sensing Imagery* ([`template.pdf`](template.pdf));
 2. identify this repository as an independent reproduction;
 3. include the exact Git commit, configuration, dataset split, and training seeds used.
