@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Run the complete Table 12 metadata-correspondence controls on one COCO set.
 
-For the closest reproduction, provide the already mixed-degraded images and
-their per-image descriptors with ``--metadata``.  The paper's mixed control set
-was not released; ``--synthesize-controlled`` creates a clearly labelled,
-deterministic approximation from clean images instead.
+Provide the mixed-degraded images and their per-image descriptors with
+``--metadata`` to evaluate an existing control set. The paper's mixed control
+set is not redistributed; ``--synthesize-controlled`` creates a clearly
+labelled deterministic surrogate from clean images instead.
 """
 
 from __future__ import annotations
@@ -66,7 +66,7 @@ def build_parser() -> argparse.ArgumentParser:
     source.add_argument(
         "--synthesize-controlled",
         action="store_true",
-        help="construct an approximate mixed-degradation set from the input clean images",
+        help="construct a deterministic surrogate mixed-degradation set from the input clean images",
     )
     parser.add_argument(
         "--training-mean",
@@ -228,7 +228,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             record["id"]: (synthetic_conditions[record["id"]].metadata, (1.0, 1.0, 1.0))
             for record in records
         }
-        source_mode = "reconstructed_synthetic_mixed_degradation"
+        source_mode = "generated_synthetic_mixed_degradation"
     else:
         assert args.metadata is not None
         base = _load_base_descriptors(annotation, args.images, args.metadata)
@@ -309,7 +309,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "index": index,
             "condition": name,
             "source_mode": source_mode,
-            "approximate": True,
+            "surrogate_input": bool(args.synthesize_controlled),
             "predictions": str(predictions_path),
             "routing": str(routing_path),
             "within_set_delta_pp_vs_correct": delta_pp,
@@ -329,27 +329,27 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         row.update({f"delta_{key}_pp": value for key, value in delta_pp.items()})
         csv_rows.append(row)
 
-    approximation_notes = []
+    deviation_notes = []
     if args.synthesize_controlled:
-        approximation_notes.append(
+        deviation_notes.append(
             "The paper's separate mixed-degradation image list and per-image settings are not public. "
             "This run assigns each source image uniformly to one of the 26 non-reference controlled-grid cells."
         )
     if args.training_mean is None:
-        approximation_notes.append(
+        deviation_notes.append(
             "No training-set descriptor mean was supplied; the available-field mean of this "
             "evaluation set is used as a proxy."
         )
-    approximation_notes.append(
+    deviation_notes.append(
         "The PDF reports perturbation magnitudes but not random draws; multiplicative errors are "
         "independent Uniform[-p,+p] per field, missing masks are independent Bernoulli draws, "
         "and shuffling is a seeded cyclic derangement."
     )
     summary = {
-        "experiment": "paper_table_10_within_set_metadata_controls",
+        "experiment": "paper_table_12_within_set_metadata_controls",
         "source_mode": source_mode,
-        "approximate": True,
-        "approximation_notes": approximation_notes,
+        "surrogate_input": bool(args.synthesize_controlled),
+        "deviation_notes": deviation_notes,
         "dataset": args.dataset,
         "weights": str(args.weights),
         "annotations": str(args.annotations),

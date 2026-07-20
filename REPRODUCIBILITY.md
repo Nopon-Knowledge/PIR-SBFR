@@ -213,7 +213,19 @@ pir-train \
   --seed 2023
 ```
 
-`configs/ablations/` provides the official public configurations for A0, A1, A2, A3, A4, A5, A6, A9, and A10. A7 direct concatenation and A8 FiLM are reported comparison controls but are not exposed as standalone YAML configurations in this release.
+`configs/ablations/` provides the official public configurations for A0, A1, A2, A3, A4, A5, A6, A9, and A10. A7 direct concatenation and A8 FiLM are reported comparison controls but are not exposed as standalone YAML configurations in this release. A2 retains A1's paired degradation and adds scale supervision plus the P5 bypass, matching its role in Tables 10 and 11.
+
+Table 11's paired 2 × 2 experiment uses the four configurations under `configs/ablations/factorial/`:
+
+| Cell | Configuration | Scale supervision | P5 bypass | AP | `AP_S` | `AP_L` |
+|---|---|---:|---:|---:|---:|---:|
+| B0 | `b0_shared_baseline.yaml` | No | No | 63.37 ± 0.45 | 44.65 ± 0.45 | 70.84 ± 0.32 |
+| BS | `bs_scale_only.yaml` | Yes | No | 63.57 ± 0.44 | 45.10 ± 0.46 | 70.73 ± 0.32 |
+| BP | `bp_p5_only.yaml` | No | Yes | 63.48 ± 0.43 | 44.78 ± 0.44 | 70.93 ± 0.32 |
+| BSP | `bsp_joint.yaml` | Yes | Yes | 63.69 ± 0.43 | 45.21 ± 0.44 | 70.91 ± 0.31 |
+| Interaction | — | — | — | +0.01 ± 0.03 | -0.02 ± 0.02 | +0.09 ± 0.01 |
+
+All four inherit A1's paired degradation, optimizer schedule, and three-seed protocol. Only scale supervision and the bypass vary. The interaction row is computed with paper Equation (26).
 
 AI-TOD-v2:
 
@@ -353,7 +365,7 @@ The paper resamples two models jointly by image identifier with replacement. Rep
 ```bash
 python scripts/bootstrap_paired_coco.py \
   --annotations datasets/DIOR/annotations/test.json \
-  --predictions-a outputs/yolo_dsf_seed2023.json \
+  --predictions-a outputs/visual_only_seed2023.json \
   --predictions-b outputs/pir_full_seed2023.json \
   --area-mode dior \
   --dior-input-size 640 \
@@ -364,6 +376,17 @@ python scripts/bootstrap_paired_coco.py \
 ```
 
 The paper uses 10,000 replicates, seed `20260718`, and a 2.5%/97.5% percentile interval. Flight experiments resample complete videos rather than frames, but the source flight data is not public.
+
+Paper Table 16 reports the following DIOR contrasts against the internal visual-only baseline:
+
+| Metric | Mean change | Seed-paired 95% CI | Paired p | Bootstrap 95% CI | Bootstrap p |
+|---|---:|---:|---:|---:|---:|
+| AP | +2.54 | [1.12, 3.96] | 0.0165 | [1.78, 3.37] | 0.0017 |
+| AP50 | +2.61 | [0.90, 4.32] | 0.0225 | [1.72, 3.58] | 0.0028 |
+| AP75 | +3.08 | [0.87, 5.29] | 0.0268 | [2.07, 4.15] | 0.0013 |
+| `AP_S` | +3.53 | [1.16, 5.90] | 0.0236 | [2.51, 4.59] | 0.0007 |
+
+The seed-paired interval measures run-to-run variation over three common seeds. The image-paired bootstrap measures test-sample variation for a fixed model contrast; these uncertainty sources must not be conflated.
 
 ## 7. Robustness protocol
 
@@ -377,7 +400,7 @@ MTF = {0.50, 0.30, 0.15}
 SNR = {30, 20, 10} dB
 ```
 
-Average seeds 2023/2024/2025 within each cell. Across YOLOv11n, YOLO-DSF, and PIR-SBFR Full, the paper obtains 81 model-condition means. Reporting only the worst cell or a one-variable slice is insufficient.
+Average seeds 2023/2024/2025 within each cell. Across YOLOv11n, the internal visual-only baseline, and PIR-SBFR Full, the paper obtains 81 model-condition means. Reporting only the worst cell or a one-variable slice is insufficient.
 
 The 27 cells for one checkpoint can be evaluated after loading the model once:
 
@@ -414,7 +437,7 @@ for seed in 2023 2024 2025; do
 done
 ```
 
-Each baseline must also generate COCO predictions for identical cells and per-image degradation seeds. Evaluate them uniformly with `pir-eval --predictions BASELINE.json --annotations ... --dataset dior` to form the paper's 81 model-condition observations. The official YOLOv11n baseline training entry point is `scripts/train_yolo11n_baseline.py`, and `configs/ablations/a0_yolo_dsf.yaml` is the public YOLO-DSF baseline configuration for this release.
+Each baseline must also generate COCO predictions for identical cells and per-image degradation seeds. Evaluate them uniformly with `pir-eval --predictions BASELINE.json --annotations ... --dataset dior` to form the paper's 81 model-condition observations. The official YOLOv11n baseline training entry point is `scripts/train_yolo11n_baseline.py`, and `configs/ablations/a0_visual_only.yaml` is the internal visual-only baseline configuration.
 
 ### 7.2 Nine conditions outside the training distribution
 
@@ -444,7 +467,7 @@ python scripts/evaluate_unseen.py \
   --output-dir output/unseen/seed2023
 ```
 
-Each result records `approximate=true` to distinguish a newly synthesized stress-test realization from the non-redistributed archived evaluation images. The flag does **not** mean that the PIR-SBFR model or public implementation is approximate. The output also records the command seed, realized random orientation, and equivalent MTF/SNR mapping.
+The eight single-family conditions follow the fully specified paper protocol. Only the regenerated joint condition records `approximate=true`, because the archived per-image PSF orientation was not retained. The flag describes that joint image realization, not the PIR-SBFR model or public implementation. Every output records the command seed, realized random orientation, and equivalent MTF/SNR mapping.
 
 ### 7.3 Mixed-degradation metadata controls
 
@@ -461,7 +484,7 @@ python scripts/metadata_controls.py \
   --output-dir output/metadata_controls/seed2023
 ```
 
-When the non-redistributed mixed set is unavailable, pass `--synthesize-controlled` to construct a deterministic, explicitly labeled synthetic control set. The script covers Table 12's correct descriptors, +/-10/20/50% multiplicative errors, 25/50/100% missingness, training-set mean, and cross-image shuffling. It reports only within-set differences relative to the correct condition and does not present regenerated samples as the archived samples behind the paper table.
+When the non-redistributed mixed set is unavailable, pass `--synthesize-controlled` to construct a deterministic control surrogate labelled with `surrogate_input=true`. The script covers Table 12's correct descriptors, +/-10/20/50% multiplicative errors, 25/50/100% missingness, training-set mean, and cross-image shuffling. It reports only within-set differences relative to the correct condition and does not present generated samples as the archived samples behind the paper table.
 
 ## 8. Parameter, GFLOP, and latency calibration
 
@@ -470,8 +493,8 @@ Paper deployment anchors at 640 x 640:
 | Model | Params (M) | GFLOPs | FP16 latency (ms) | FPS | AP |
 |---|---:|---:|---:|---:|---:|
 | YOLOv11n | 2.584 | 6.47 | 2.347 | 426.1 | 57.31 |
-| YOLO-DSF | 3.628 | 8.43 | 3.079 | 324.8 | 62.98 |
-| DSF + scale supervision + P5 bypass | 3.691 | 8.51 | 3.117 | 320.8 | 63.69 |
+| Internal visual-only baseline | 3.628 | 8.43 | 3.079 | 324.8 | 62.98 |
+| Internal scaffold + scale supervision + P5 bypass | 3.691 | 8.51 | 3.117 | 320.8 | 63.69 |
 | PIR-SBFR Full | 3.942 | 8.82 | 3.313 | 301.8 | 65.52 |
 
 Direct THOP measurements for the repository's default `PIRSBFRModel(nc=20)` on a real 640 x 640 input:
@@ -511,7 +534,20 @@ An Ultralytics trainer checkpoint contains a pickled model object. Use `--allow-
 
 The timing includes only the network forward and excludes disk access, image decoding, resize, host-to-device transfer, NMS, and serialization. Latency measured on different GPUs, power limits, drivers, or clock states should not be compared directly with the paper's RTX 4090 value.
 
-## 9. Minimum acceptance checklist
+## 9. Claim boundaries from paper Table 18
+
+The experiment suite supports bounded conclusions. Reports generated with this repository must preserve the paper's distinction between supported evidence and claims outside the study design.
+
+| Evidence block | Supported interpretation | Boundary |
+|---|---|---|
+| DIOR | effectiveness on a public benchmark with broad object scales | native-telemetry use and transfer to another sensor are not tested |
+| AI-TOD-v2 | effectiveness on a second dataset in the tiny-object regime | platform-independent and multi-sensor generalization are not established |
+| Paired 2 × 2 ablation | separate scale-supervision, P5-bypass, and interaction effects under one protocol | remaining losses and reliability terms are not independently factorized |
+| 27-condition grid | directional consistency across controlled GSD, MTF, and SNR changes | calibrated atmospheric, optical, and radiometric modeling is not evaluated |
+| Held-out operators and metadata controls | robustness beyond fitted operators and dependence on correctly paired descriptors | sensor-level causality and coverage of all natural degradations are not established |
+| Eight UAV videos | within-platform transfer across flights and unseen heights using recorded context | transfer across cameras, payloads, and acquisition platforms is not tested |
+
+## 10. Minimum acceptance checklist
 
 - [ ] Split image counts match paper Table 2.
 - [ ] All three seeds are trained from scratch, with configuration and environment saved.

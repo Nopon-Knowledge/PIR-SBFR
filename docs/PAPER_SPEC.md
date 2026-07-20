@@ -16,7 +16,7 @@ The paper defines the following components sufficiently:
 
 For release-level components that the paper summarizes at method level, the official source code provides the complete executable definitions:
 
-- complete executable YOLO-DSF topology, layer indices, and width/depth settings;
+- complete executable internal visual-only baseline topology, layer indices, and width/depth settings;
 - the public visual-only SBFR baseline configuration;
 - DRFB `Conv_cat`, exact insertion locations, count, convolution groups, and final activation;
 - channel-alignment output width and operator;
@@ -67,7 +67,7 @@ The P5 structural bypass does not add P5 before routing or after FACH. It starts
 - FACH: `src/pir_sbfr/models/blocks.py::FACH`
 - YOLO Detect: `src/pir_sbfr/models/detector.py::PIRSBFRModel`
 
-## 3. Equations 1-24 mapping
+## 3. Equations 1-26 mapping
 
 | Paper equation | Meaning | Official implementation | Agreement and source definitions |
 |---|---|---|---|
@@ -77,22 +77,24 @@ The P5 structural bypass does not add P5 before routing or after FACH. It starts
 | (5) | Compression of concatenated responses | `DRFB.compress` | Official release uses 1x1 Conv+BN+SiLU |
 | (6) | Restore to C and add identity | `DRFB.restore`, `DRFB.forward` | Official release uses BN without pre-add activation, followed by post-add SiLU |
 | (7) | `m=[g,q,s]`, `a=[a_g,a_q,a_s]` | `PhysicalReliabilityPrior` input | Code names should be interpreted as GSD/MTF/SNR to avoid confusion with scale target `q` |
-| (8) | Three non-negative degradation coordinates | `degradation_coordinates` | Mathematically aligned; missing values are replaced by references before operations to prevent NaNs |
-| (9)-(10) | Stride-monotonic analytic prior | `PhysicalReliabilityPrior.forward` | No trainable parameters; fixed kappa |
-| (11) | Three-level channel alignment + GAP concatenation | `PIRSBFRNeck.align`, `VisualResidualRouter.forward` | Official aligned width is 64 |
-| (12) | K-branch visual mixture | `VisualResidualRouter`, `ResidualExpert` | Official release fixes K=4, MLP hidden width 280, and tanh bound 4 |
-| (13) | `q_hat=softmax(delta_vis)` | `VisualResidualRouter.forward` | Matches |
-| (14) | Labeled scale distribution | `object_scale_distribution` | `epsilon=1e-6`; computed from boxes after augmentation |
-| (15) | `D_KL(q || q_hat)` | `scale_kl_divergence` | Batch mean; official loss averages clean and degraded views |
-| (16) | Visual + physical logit fusion | `PIRSBFRNeck.forward` | Code uses `log(clamp_min(rho,eps))`; paper writes `log(rho+eps)` |
-| (17) | `P_i_rw=3*w_i*Pbar_i` | `PIRSBFRNeck.forward` | Matches |
-| (18) | Original FPN-PAN | `FPNPAN` | Official release defines the complete topology directly in Python |
-| (19) | `F5 <- F5+A5(P5)` | `p5_projection` | Independent projection; does not share weights with alignment A5 |
-| (20) | Symmetric KL + normalized-box L1 | `PIRSBFRLoss.consistency_loss` | Clean TaskAligned foreground defines shared R; class softmax; SKL includes 0.5 |
-| (21) | Paired detection + scale + consistency | `PIRSBFRLoss.__call__` | Equation weights match; multiplied by batch size for the Ultralytics loss-return convention |
-| (22) | FACH channel gate | `FeatureAwareCoupling.channel_gate` | Independent Linear(C,C)+sigmoid per level |
-| (23) | Dynamic experts + identity | `FeatureAwareCoupling.expert_gate/experts` | Three source-defined separable-conv experts per level |
-| (24) | Classification/regression separation after coupled feature | `FeatureAwareCoupling.coupled` + `Detect` | FACH creates shared features; official Detect supplies cls/reg branches and DFL |
+| (8) | Attitude-corrected relative GSD for flight metadata | external flight-metadata preprocessing | Uses synchronized height and off-nadir angle; private flight records are not redistributed |
+| (9) | Three non-negative degradation coordinates | `degradation_coordinates` | Mathematically aligned; missing values are replaced by references before operations to prevent NaNs |
+| (10)-(11) | Stride-monotonic analytic prior | `PhysicalReliabilityPrior.forward` | No trainable parameters; fixed inverse-stride kappa |
+| (12) | Three-level channel alignment + GAP concatenation | `PIRSBFRNeck.align`, `VisualResidualRouter.forward` | Official aligned width is 64 |
+| (13) | K-branch visual mixture | `VisualResidualRouter`, `ResidualExpert` | Official release fixes K=4, MLP hidden width 280, and tanh bound 4 |
+| (14) | `q_hat=softmax(delta_vis)` | `VisualResidualRouter.forward` | Matches |
+| (15) | Labeled scale distribution | `object_scale_distribution` | `epsilon=1e-6`; computed from boxes after augmentation |
+| (16) | `D_KL(q || q_hat)` | `scale_kl_divergence` | Batch mean; official loss averages clean and degraded views |
+| (17) | Visual + physical logit fusion | `PIRSBFRNeck.forward` | Code uses `log(clamp_min(rho,eps))`; paper writes `log(rho+eps)` |
+| (18) | `P_i_rw=3*w_i*Pbar_i` | `PIRSBFRNeck.forward` | Matches |
+| (19) | Original FPN-PAN | `FPNPAN` | Official release defines the complete topology directly in Python |
+| (20) | `F5 <- F5+A5(P5)` | `p5_projection` | Independent projection; does not share weights with alignment A5 |
+| (21) | Symmetric KL + normalized-box L1 | `PIRSBFRLoss.consistency_loss` | Clean TaskAligned foreground defines shared R; class softmax; SKL includes 0.5 |
+| (22) | Paired detection + scale + consistency | `PIRSBFRLoss.__call__` | Equation weights match; multiplied by batch size for the Ultralytics loss-return convention |
+| (23) | FACH channel gate | `FeatureAwareCoupling.channel_gate` | Independent Linear(C,C)+sigmoid per level |
+| (24) | Dynamic experts + identity | `FeatureAwareCoupling.expert_gate/experts` | Three source-defined separable-conv experts per level |
+| (25) | Classification/regression separation after coupled feature | `FeatureAwareCoupling.coupled` + `Detect` | FACH creates shared features; official Detect supplies cls/reg branches and DFL |
+| (26) | Paired 2 × 2 factorial interaction | `configs/ablations/factorial/` + seed summaries | B0, BS, BP, and BSP vary only scale supervision and the P5 bypass |
 
 ## 4. DRFB specification
 
@@ -200,9 +202,17 @@ Fixed reference:
 g_{ref}=1,\quad q_{ref}=0.50,\quad s_{ref}=30
 \]
 
+For the private flight collection, paper equation (8) defines attitude-corrected relative GSD:
+
+\[
+g=\frac{H/\cos\theta}{H_{ref}/\cos\theta_{ref}}
+\]
+
+Here `H` is recorded height and `theta` is the off-nadir angle obtained from synchronized attitude and IMU fields. This preprocessing belongs to the restricted flight-data workflow; public benchmark runs receive controlled relative GSD directly.
+
 ### 6.2 Degradation coordinates
 
-Equation (8):
+Equation (9):
 
 \[
 d_g=\max(0,\log(g/g_{ref}))
@@ -220,7 +230,7 @@ The code first replaces fields whose mask is zero with reference values, then pe
 
 ### 6.3 level-wise prior
 
-Equations (9)-(10):
+Equations (10)-(11):
 
 \[
 \rho_i^{phy}=\exp[-\kappa_i^T(\mathbf{a}\odot\mathbf{d})]
@@ -242,7 +252,7 @@ This module has no trainable parameters. When every field is missing, `a=0` give
 
 ## 7. Scale-supervised visual residual
 
-Equation (11):
+Equation (12):
 
 \[
 \bar P_i=A_i(P_i),\quad
@@ -251,7 +261,7 @@ z=[GAP(\bar P_3);GAP(\bar P_4);GAP(\bar P_5)]
 
 Each official `A_i` is an independent Ultralytics `1x1 Conv+BN+SiLU` that outputs 64 channels, so `z` has dimension 192.
 
-Equations (12)-(13):
+Equations (13)-(14):
 
 \[
 \pi=softmax(W_\pi z)
@@ -283,7 +293,7 @@ medium: 32^2 <= area < 96^2    -> P4
 large:  area >= 96^2           -> P5
 ```
 
-Equation (14):
+Equation (15):
 
 \[
 q=\frac{[n_S,n_M,n_L]^T+\epsilon}{n_S+n_M+n_L+3\epsilon}
@@ -299,7 +309,7 @@ medium 32-64 px                 -> P5
 
 The code computes pixel area/absolute size from normalized `xywh` on the actual post-augmentation network input. `epsilon=1e-6`; images without objects receive a uniform target.
 
-Equation (15):
+Equation (16):
 
 \[
 L_{scale}=D_{KL}(q\|\hat q)
@@ -322,7 +332,7 @@ AI-TOD-v2 is a dense tiny-object dataset and must not use COCO's default 100-det
 
 ## 8. Logit-space fusion and P5 bypass
 
-Equation (16):
+Equation (17):
 
 \[
 w_i=
@@ -339,7 +349,7 @@ weights = softmax((delta_vis + physical_logits) / temperature)
 
 `clamp_min(eps)` is the official source-level stabilization for the paper's `rho+eps` expression and prevents extreme exponential underflow.
 
-Equation (17):
+Equation (18):
 
 \[
 P_i^{rw}=3w_i\bar P_i
@@ -347,7 +357,7 @@ P_i^{rw}=3w_i\bar P_i
 
 The factor 3 preserves feature magnitude when `w_i=1/3`. In the official implementation, each `w_i` is a `[B]` image-level scalar broadcast over channels and spatial positions.
 
-Equations (18)-(19):
+Equations (19)-(20):
 
 \[
 (F_3,F_4,F_5)=N_{FPN-PAN}(P_3^{rw},P_4^{rw},P_5^{rw})
@@ -365,7 +375,7 @@ During training, each acquisition field and its mask are independently dropped w
 
 The official `PairedDegradationGenerator` samples one field-level mask for a clean/degraded pair and shares it across both views. Consistency loss therefore does not also mix metadata-missingness differences.
 
-Equation (20):
+Equation (21):
 
 \[
 L_{cons}=\frac{1}{|R|}\sum_{r\in R}
@@ -387,7 +397,7 @@ Official source definitions:
 - Normalize decoded boxes by image width/height and compute four-coordinate L1.
 - Return a differentiable zero when no foreground exists.
 
-Equation (21):
+Equation (22):
 
 \[
 L=\frac12(L_{det}(I)+L_{det}(I'))+
@@ -398,7 +408,7 @@ Fixed values are `lambda_scale=lambda_cons=0.1`. The official detection loss, DF
 
 ## 10. FACH specification
 
-For neck level `F_i in R^(H_i x W_i x C)`, equation (22) is:
+For neck level `F_i in R^(H_i x W_i x C)`, equation (23) is:
 
 \[
 z_i=GAP(F_i)
@@ -408,7 +418,7 @@ z_i=GAP(F_i)
 F_i^c=F_i\odot\sigma(W_cz_i+b_c)
 \]
 
-Equation (23):
+Equation (24):
 
 \[
 \phi_i=softmax(W_rz_i+b_r)
@@ -418,7 +428,7 @@ Equation (23):
 F_i^{out}=F_i+\sum_{j=1}^{K_h}\phi_{ij}J_j(F_i^c)
 \]
 
-Equation (24):
+Equation (25):
 
 \[
 G_i=C_{coupled}(F_i^{out}),\quad
@@ -452,15 +462,15 @@ neck feature
 
 These details define the canonical runnable model released with the paper. They complement the paper's abstract FACH equations and are authoritative for public-code execution.
 
-## 11. Official YOLO-DSF and ablation configurations
+## 11. Internal visual-only baseline and ablation configurations
 
-The paper defines YOLO-DSF as:
+The current paper constructs an internal visual-only baseline within the shared codebase:
 
 ```text
 DRFB backbone + visual-only SBFR + FACH
 ```
 
-The official public A0 configuration instantiates this visual-only baseline with the following switches:
+The official public A0 configuration instantiates that baseline with the following switches:
 
 ```python
 PIRSBFRModel(
@@ -474,12 +484,12 @@ PIRSBFRModel(
 )
 ```
 
-This is the canonical YOLO-DSF baseline exposed by the official repository and the supported starting point for public ablation runs.
+This internal control is the supported starting point for public ablation runs. It is not presented as a separate published detector.
 
 The repository records these choices in `configs/ablations/`:
 
 ```text
-a0_yolo_dsf.yaml
+a0_visual_only.yaml
 a1_degradation_augmentation.yaml
 a2_scale_p5.yaml
 a3_gsd.yaml
@@ -488,17 +498,21 @@ a5_snr.yaml
 a6_analytic_all.yaml
 a9_no_consistency.yaml
 a10_full.yaml
+factorial/b0_shared_baseline.yaml
+factorial/bs_scale_only.yaml
+factorial/bp_p5_only.yaml
+factorial/bsp_joint.yaml
 ```
 
 A7 direct concatenation and A8 FiLM are reported comparison controls but are not exposed as standalone YAML configurations in this public release. Their paper-reported values remain part of the experimental record; the executable configuration set focuses on A0-A6, A9, and A10.
 
-The public configurations use the following authoritative mapping. A0 disables paired degradation, the physical route, the bypass, and both auxiliary losses. A1 enables only paired degradation. A2 disables paired degradation but enables the visual route, scale loss, and bypass; its clean-only loss branch still computes scale KL while physical routing and consistency remain disabled. A3-A6 disable the visual route and both auxiliary losses, retain only the specified analytic prior and bypass, and inherit `degradation.enabled=true`, so detection loss still averages clean/degraded pairs. A9 and A10 both use dual routes and differ only in `lambda_consistency=0/0.1`. When the bypass is disabled, the constructor does not register the 66,048 inactive parameters of `p5_projection`.
+The public configurations use the following authoritative mapping. A0 disables paired degradation, the physical route, the bypass, and both auxiliary losses. A1 adds paired degradation. A2 retains paired degradation and enables the visual scale loss plus the bypass. A3-A6 disable the visual route and both auxiliary losses, retain only the specified analytic prior and bypass, and inherit `degradation.enabled=true`, so detection loss averages clean/degraded pairs. A9 and A10 both use dual routes and differ only in `lambda_consistency=0/0.1`. When the bypass is disabled, the constructor does not register the 66,048 inactive parameters of `p5_projection`.
 
 Paper Table 10 and the official YAML files together define the ablation family; rows are controlled configurations rather than a strictly cumulative sequence:
 
 | ID | Paper name | Official public setting | Release note |
 |---|---|---|---|
-| A0 | YOLO-DSF | visual-only, no PIR, no bypass | Public baseline: `a0_yolo_dsf.yaml` |
+| A0 | Internal visual-only baseline | visual-only, no PIR, no bypass | Public baseline: `a0_visual_only.yaml` |
 | A1 | + degradation augmentation | A0 structure plus paired degradation | Public configuration: `a1_degradation_augmentation.yaml` |
 | A2 | + scale supervision + P5 bypass | visual scale loss + bypass | Public configuration: `a2_scale_p5.yaml` |
 | A3-A5 | single physical reliability | matching one-hot `physical_fields`, with bypass | Public GSD/MTF/SNR configurations |
@@ -506,6 +520,21 @@ Paper Table 10 and the official YAML files together define the ablation family; 
 | A7-A8 | concat / FiLM controls | paper-reported metadata-conditioning controls | No standalone YAML in this release |
 | A9 | analytic prior + visual residual | dual PIR routes, with bypass | Public configuration: `a9_no_consistency.yaml` |
 | A10 | Full | A9 + consistency | Public configuration: `a10_full.yaml` |
+
+Paper equation (26) defines the paired factorial interaction:
+
+\[
+\Delta_{int}=Y_{11}-Y_{10}-Y_{01}+Y_{00}
+\]
+
+The four Table 11 cells inherit A1's degradation-augmented training protocol and vary only scale supervision and the P5 bypass:
+
+| Cell | Public configuration | Scale supervision | P5 bypass |
+|---|---|---:|---:|
+| B0 | `factorial/b0_shared_baseline.yaml` | No | No |
+| BS | `factorial/bs_scale_only.yaml` | Yes | No |
+| BP | `factorial/bp_p5_only.yaml` | No | Yes |
+| BSP | `factorial/bsp_joint.yaml` | Yes | Yes |
 
 ## 12. Parameter and GFLOP calibration
 
@@ -515,9 +544,9 @@ Paper Table 10 and the official YAML files together define the ablation family; 
 |---|---:|---:|---|
 | YOLOv11n | 2.584 | 6.47 | base |
 | PAN-FPN + DRFB/FACH | 3.462 | 8.08 | Aggregate difference from DRFB/FACH and the controlled neck |
-| YOLO-DSF | 3.628 | 8.43 | Visual-only SBFR aggregation adds approximately `+0.166M/+0.35G` |
-| scale supervision + P5 bypass | 3.691 | 8.51 | `+0.063M/+0.08G` over DSF; scale loss itself has no deployment parameters |
-| PIR-SBFR Full | 3.942 | 8.82 | `+0.314M/+0.39G` over DSF |
+| Internal visual-only baseline | 3.628 | 8.43 | Visual-only SBFR aggregation adds approximately `+0.166M/+0.35G` |
+| Internal scaffold + scale supervision + P5 bypass | 3.691 | 8.51 | `+0.063M/+0.08G` over the internal baseline; scale loss itself has no deployment parameters |
+| PIR-SBFR Full | 3.942 | 8.82 | `+0.314M/+0.39G` over the internal baseline |
 
 Paper Table 8 lists the no-consistency control as 3.897M/8.76G and Full as 3.942M/8.82G. Section 4.9 states that the stored no-consistency record used incompatible resource counts, so Table 17 omits that deployment row. Because consistency is training-only, the two variants have the same deployed graph in the official release.
 
@@ -618,9 +647,35 @@ The public script deterministically generates a joint condition for a fixed comm
 
 These definitions make every newly generated OOD run deterministic for a recorded seed. Dataset provenance should still distinguish newly generated stress-test images from non-redistributed archived evaluation images.
 
-## 14. Boundaries of the non-redistributed flight experiment
+## 14. Statistical evidence and claim boundaries
 
-The paper's flight collection contains eight complete videos, altitudes from 5.2 to 30.0 m, 5,370 annotated frames, and 38,947 instances. It is not a public benchmark, and the paper's Data Availability statement provides no download location.
+### 14.1 Table 16 uncertainty summary
+
+Paper Table 16 compares PIR-SBFR Full with the internal visual-only baseline on DIOR. Seed-paired intervals estimate training-run variation over the three common seeds, while image-paired bootstrap intervals estimate test-sample variation for a fixed contrast.
+
+| Metric | Mean change | Seed-paired 95% CI | Paired p | Bootstrap 95% CI | Bootstrap p |
+|---|---:|---:|---:|---:|---:|
+| AP | +2.54 | [1.12, 3.96] | 0.0165 | [1.78, 3.37] | 0.0017 |
+| AP50 | +2.61 | [0.90, 4.32] | 0.0225 | [1.72, 3.58] | 0.0028 |
+| AP75 | +3.08 | [0.87, 5.29] | 0.0268 | [2.07, 4.15] | 0.0013 |
+| `AP_S` | +3.53 | [1.16, 5.90] | 0.0236 | [2.51, 4.59] | 0.0007 |
+
+Paper Figure 9 reports positive AP50 changes for 17 of the 20 DIOR categories. Dam and bridge have the largest gains (+11.15 and +9.18 points); airplane, stadium, and storage tank change by -0.17, -0.11, and -0.43 points. The aggregate gain is broad but not universal across categories.
+
+### 14.2 Table 18 claim-evidence-boundary map
+
+| Evidence block | Supported interpretation | Boundary |
+|---|---|---|
+| DIOR | effectiveness on a public benchmark with broad object scales | native-telemetry use and transfer to another sensor are not tested |
+| AI-TOD-v2 | effectiveness on a second dataset in the tiny-object regime | platform-independent and multi-sensor generalization are not established |
+| Paired 2 × 2 ablation | separate scale-supervision, P5-bypass, and interaction effects | remaining losses and reliability terms are not independently factorized |
+| 27-condition grid | directional consistency across controlled GSD, MTF, and SNR changes | calibrated atmospheric, optical, and radiometric modeling is not evaluated |
+| Held-out operators and metadata controls | robustness beyond fitted operators and dependence on correctly paired descriptors | sensor-level causality and coverage of all natural degradations are not established |
+| Eight UAV videos | within-platform transfer across flights and unseen heights | transfer across cameras, payloads, and acquisition platforms is not tested |
+
+## 15. Boundaries of the non-redistributed flight experiment
+
+The paper's flight collection contains eight complete videos, altitudes from 5.2 to 30.0 m, 5,370 annotated frames, and 38,947 instances. It is not a public benchmark. The paper's Data Availability Statement says that distribution is restricted by the data-providing institution.
 
 Relative GSD is obtained from attitude-corrected slant range:
 
@@ -630,13 +685,13 @@ g=\frac{H/\cos\theta}{H_{ref}/\cos\theta_{ref}}
 
 MTF/PSF and SNR are not recorded, so their masks must be zero and must not be inferred from labels or imagery. The numerical values in Tables 14/15 are the authoritative paper record; the public repository preserves the official inference API and missing-field logic but does not redistribute the private videos, annotations, or telemetry needed to rerun those tables.
 
-## 15. External implementations and references
+## 16. External implementations and references
 
 Base code repository directly cited by the paper:
 
 - Jocher, G.; Qiu, J. *Ultralytics YOLO11, Version 11.0.0* (2024): `https://github.com/ultralytics/ultralytics`
 
-The same repository is also used for the paper's YOLOv8 citation. This repository is the official PIR-SBFR release. Model weights and training checkpoints, including YOLO-DSF checkpoints, cannot be publicly distributed under the institutional regulations governing this work.
+The same repository is also used for the paper's YOLOv8 citation. This repository is the official PIR-SBFR release. Model weights and training checkpoints, including internal-baseline checkpoints, cannot be publicly distributed under the institutional regulations governing this work.
 
 Related method references:
 

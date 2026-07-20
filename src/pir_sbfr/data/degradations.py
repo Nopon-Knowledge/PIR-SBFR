@@ -292,7 +292,7 @@ def stripe_read_noise(
     rng: np.random.Generator,
 ) -> np.ndarray:
     # Stripe orientation/frequency/phase are absent from the PDF. This explicit
-    # vertical sinusoidal realization is used only for the approximate OOD tool.
+    # The official held-out evaluator uses a vertical sinusoidal realization.
     width = image.shape[1]
     phase = float(rng.uniform(0.0, 2.0 * math.pi))
     stripe = amplitude * np.sin(np.linspace(0.0, 8.0 * math.pi, width, dtype=np.float32) + phase)

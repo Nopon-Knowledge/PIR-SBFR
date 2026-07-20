@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
   <title id="title">Paper-reported cross-dataset accuracy and efficiency results</title>
-  <desc id="desc">Grouped bars compare YOLOv11n, YOLO-DSF, and PIR-SBFR on DIOR and AI-TOD-v2. A scatter plot shows DIOR AP versus GFLOPs for four efficiency-tested variants.</desc>
+  <desc id="desc">Grouped bars compare YOLOv11n, the internal visual-only baseline, and PIR-SBFR on DIOR and AI-TOD-v2. A scatter plot shows DIOR AP versus GFLOPs for four efficiency-tested variants.</desc>
   <defs>
     <linearGradient id="paperBg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#071526"/>
@@ -20,9 +20,9 @@
   </g>
   <text x="90" y="192" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="25" font-weight="700">Cross-dataset accuracy</text>
   <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">
-    <rect x="355" y="171" width="17" height="17" rx="3" fill="#667f9f"/><text x="382" y="185" fill="#b7c8df">YOLOv11n</text>
-    <rect x="485" y="171" width="17" height="17" rx="3" fill="#3974b9"/><text x="512" y="185" fill="#b7c8df">YOLO-DSF</text>
-    <rect x="620" y="171" width="17" height="17" rx="3" fill="#21b6a6"/><text x="647" y="185" fill="#b7c8df">PIR-SBFR Full</text>
+    <rect x="405" y="171" width="17" height="17" rx="3" fill="#667f9f"/><text x="432" y="185" fill="#b7c8df">YOLOv11n</text>
+    <rect x="525" y="171" width="17" height="17" rx="3" fill="#3974b9"/><text x="552" y="185" fill="#b7c8df">Internal baseline</text>
+    <rect x="680" y="171" width="17" height="17" rx="3" fill="#21b6a6"/><text x="707" y="185" fill="#b7c8df">PIR-SBFR Full</text>
   </g>
 
   <g stroke="#29415f" stroke-width="1">
@@ -97,9 +97,9 @@
   <g font-family="Inter,Segoe UI,Arial,sans-serif">
     <text x="1016" y="686" fill="#c9d8eb" font-size="15">YOLOv11n</text>
     <path d="M1275 425 L1378 397" stroke="#6f8daf" stroke-width="2"/>
-    <text x="1115" y="432" fill="#c9d8eb" font-size="15">YOLO-DSF</text>
+    <text x="1115" y="432" fill="#c9d8eb" font-size="15">Internal baseline</text>
     <path d="M1288 337 L1394 357" stroke="#6f8daf" stroke-width="2"/>
-    <text x="1085" y="321" fill="#c9d8eb" font-size="15">DSF + scale supervision</text>
+    <text x="1085" y="321" fill="#c9d8eb" font-size="15">Internal scaffold + scale supervision</text>
     <text x="1085" y="340" fill="#c9d8eb" font-size="15">+ P5 bypass</text>
     <path d="M1390 245 L1456 269" stroke="#61cfc1" stroke-width="2"/>
     <text x="1270" y="239" fill="#e6fffb" font-size="16" font-weight="700">PIR-SBFR Full</text>

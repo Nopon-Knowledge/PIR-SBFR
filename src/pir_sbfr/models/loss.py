@@ -19,7 +19,7 @@ def object_scale_distribution(
     mode: str = "dior",
     eps: float = 1e-6,
 ) -> Tensor:
-    """Build the annotation-only scene scale target from paper equation (14).
+    """Build the annotation-only scene scale target from paper equation (15).
 
     Ultralytics stores normalized ``xywh`` boxes after all geometric/mosaic
     transforms, so the counts here describe final visible boxes at the actual
@@ -64,7 +64,7 @@ def scale_kl_divergence(target: Tensor, estimate: Tensor, eps: float = 1e-6) -> 
 
 
 class PIRSBFRLoss:
-    """Paper equation (21) on top of Ultralytics' native YOLO11 detection loss."""
+    """Paper equation (22) on top of Ultralytics' native YOLO11 detection loss."""
 
     def __init__(
         self,
@@ -94,7 +94,7 @@ class PIRSBFRLoss:
         return pred_distri, pred_scores, pred_boxes_grid, anchor_points, stride_tensor
 
     def _positive_mask(self, feats: Sequence[Tensor], batch: Dict[str, Tensor]) -> Tensor:
-        """Use clean-view TaskAligned assignments as the shared set R in equation (20)."""
+        """Use clean-view TaskAligned assignments as the shared set R in equation (21)."""
         _, pred_scores, pred_boxes, anchor_points, stride_tensor = self._dense_predictions(feats)
         batch_size = pred_scores.shape[0]
         dtype = pred_scores.dtype
