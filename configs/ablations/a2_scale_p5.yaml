@@ -7,4 +7,4 @@ model:
     use_visual: true
     p5_bypass: true
 degradation:
-  enabled: false
+  enabled: true

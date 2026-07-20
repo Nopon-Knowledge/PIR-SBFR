@@ -1,23 +1,25 @@
 # PIR-SBFR Reproducibility Protocol
 
-This document provides a complete execution path from public-data preparation and three-seed training through evaluation, paired bootstrap analysis, and deployment-efficiency calibration. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) for the equation-by-equation mapping between the paper and this implementation.
+This document provides a complete execution path from public-data preparation and three-seed training through evaluation, paired bootstrap analysis, and deployment-efficiency calibration. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) for the equation-by-equation mapping between the paper and the official source code.
 
 ## 1. Protocol scope
 
 Interpret results and experiment records using three distinct categories:
 
-- **Paper-fixed setting:** a formula, value, data split, or test procedure explicitly specified in the original PIR-SBFR paper.
-- **Implementation choice:** a concrete choice required for a runnable model but not disclosed by the paper.
-- **Not exactly reproducible:** an item that lacks public data, sample-level parameters, or original code and therefore cannot be matched at the pixel or parameter level.
+- **Paper-level definition:** a formula, value, data split, result, or test procedure stated in the PIR-SBFR paper.
+- **Official source definition:** a release-level architectural, numerical, or execution detail fixed by this repository where the paper presents a higher-level description.
+- **External artifact boundary:** an experiment that depends on data or a per-sample realization that is not redistributed in the public repository.
 
-The public DIOR and AI-TOD-v2 main experiments can be rerun with the paper's splits, but this repository must not be described as the authors' official implementation. The paper does not publish the complete YOLO-DSF YAML, the original visual-only SBFR, detailed FACH dynamic branches, training logs, model weights, or source code. This implementation is constrained by the paper's equations and calibrated against the reported parameter count and GFLOPs.
+This repository is the **official implementation released by the PIR-SBFR paper authors**. The paper and source code are complementary: the paper defines the method and reports the experiments, while this repository is authoritative for release-level network topology, framework settings, executable configurations, and numerical conventions. The DIOR and AI-TOD-v2 experiments can be rerun from the public code and datasets using the protocol below.
 
-The following two items cannot be reproduced exactly:
+Two reported evaluations depend on artifacts that are not redistributed:
 
-- **Real flight experiments:** the eight videos, annotations, and synchronized altitude/attitude/IMU records are not public.
-- **Joint OOD condition:** the paper records only "2.5x sampling + unseen PSF + unseen noise" and does not preserve the sampled PSF orientation, preventing pixel-identical reconstruction.
+- **Real flight experiments:** the eight videos, annotations, and synchronized altitude/attitude/IMU records remain private research data.
+- **Archived joint OOD realization:** the paper reports "2.5x sampling + unseen PSF + unseen noise," but the exact per-image PSF realization used for the reported table is not included in the repository.
 
-In addition, the mixed-degradation metadata control set does not include a public per-image degradation manifest. A control experiment of the same type can be reconstructed, but sample-level identity cannot be guaranteed.
+Pretrained weights and training checkpoints are a separate restricted release artifact. They cannot be publicly distributed under the institutional regulations governing this work. All commands below therefore use checkpoints produced by local training runs; the documented three-seed protocol is the supported path for obtaining them.
+
+The mixed-degradation metadata-control images and their per-image manifest are also not redistributed. The official scripts provide deterministic protocol-equivalent generation paths for new evaluations, but a newly generated sample set should not be presented as the archived sample set used for the paper's numerical table.
 
 ## 2. Environment
 
@@ -38,7 +40,7 @@ Check package versions and CUDA availability:
 python -c "import torch, ultralytics; print(torch.__version__, torch.version.cuda, ultralytics.__version__); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 ```
 
-The paper states that the baseline uses "Ultralytics YOLO11, Version 11.0.0" but provides no source commit. `ultralytics==8.3.0` is the pinned Python release containing YOLO11 modules; it is not equivalent to the paper's undisclosed exact source snapshot.
+The paper identifies the baseline as "Ultralytics YOLO11, Version 11.0.0." The official public code standardizes the executable dependency on `ultralytics==8.3.0`, the Python package release containing the YOLO11 modules used by this repository.
 
 ## 3. Data preparation
 
@@ -63,7 +65,7 @@ python scripts/prepare_dior.py \
 
 The converter reads official split, image, and XML annotation locations by default. Override split/image/XML paths explicitly for nonstandard layouts; `--source-root` and `--output-root` are compatibility aliases for `--source` and `--output`. Use `--mode copy` to copy rather than symlink. The converter is idempotent and refuses to overwrite conflicting content silently.
 
-The converter interprets XML coordinates as the official VOC one-based inclusive convention. `difficult` instances are retained in training labels by default and recorded as `difficult/ignore` with `iscrowd=1` in generated COCO ground truth so stock COCOeval truly ignores them. The paper does not specify a difficult-instance policy. If `--exclude-difficult` is used, apply the same conversion to every model and all three seeds, and disclose the deviation from this repository's default protocol.
+The converter interprets XML coordinates as the official VOC one-based inclusive convention. `difficult` instances are retained in training labels by default and recorded as `difficult/ignore` with `iscrowd=1` in generated COCO ground truth so stock COCOeval truly ignores them. This is the official source convention. If `--exclude-difficult` is used, apply the same conversion to every model and all three seeds, and disclose the deviation from the default protocol.
 
 Inspect the generated configuration:
 
@@ -132,9 +134,9 @@ By default, AI-TOD-v2 instances with `iscrowd=1` are excluded from YOLO training
 
 Spatial and color augmentation must be sampled once for the clean/degraded pair. Both views share the crop, scale, flip, and labels. Degradation randomness is keyed by `training seed + epoch + image identifier` so different models use paired random numbers.
 
-The CLI enables AMP and `deterministic=True` by default, uses eight dataloader workers, and sets `nbs=batch=16` to avoid additional gradient accumulation. The paper does not disclose training precision, deterministic-backend settings, or worker count. AMP can be disabled with `--no-amp`, but the choice must remain identical across all three seeds and every comparison.
+The official CLI enables AMP and `deterministic=True` by default, uses eight dataloader workers, and sets `nbs=batch=16` to avoid additional gradient accumulation. AMP can be disabled with `--no-amp`, but the choice must remain identical across all three seeds and every comparison.
 
-The paper provides only the initial learning rate and warmup duration. It does not specify the final learning-rate ratio, scheduler shape, initial warmup momentum/bias LR, or internal YOLO detection-loss gains. This implementation explicitly pins the Ultralytics 8.3.0 choices: linear decay (`cos_lr=false`), `lrf=0.01`, `warmup_momentum=0.8`, `warmup_bias_lr=0.1`, and `box/cls/dfl=7.5/0.5/1.5`. These are reproducible implementation choices, not paper-reported values.
+The official source complements the paper's initial learning rate and warmup duration with a fully pinned schedule: linear decay (`cos_lr=false`), `lrf=0.01`, `warmup_momentum=0.8`, `warmup_bias_lr=0.1`, and `box/cls/dfl=7.5/0.5/1.5`. These are canonical release settings, not estimates inferred from the reported results.
 
 ### 4.2 Paired degradation
 
@@ -158,9 +160,9 @@ degraded view:
 
 A dash in paper Table 3 means that the corresponding operator is not applied; its descriptor value uses the clean reference. Each GSD/MTF/SNR field is independently masked with `p_drop=0.25`. Relative GSD remains 1 during training. Resolution changes, motion blur, disk PSF, anisotropic blur, speckle noise, and stripe noise are not used for training.
 
-The current `PairedDegradationGenerator` shares one field-level dropout mask across a clean/degraded pair so the consistency loss does not also mix different missingness patterns. The paper does not state whether the views share a mask, so this is an implementation choice. Gaussian blur uses reflection padding; the paper does not specify boundary handling.
+The official `PairedDegradationGenerator` shares one field-level dropout mask across a clean/degraded pair so the consistency loss does not also mix different missingness patterns. Gaussian blur uses reflection padding. Both behaviors are source-defined parts of the public protocol.
 
-The current RNG key uses the dataloader-provided `im_file` string, usually an absolute path, whereas the paper refers to an image identifier. Moving or renaming the dataset root therefore changes the degradation sequence. All three seeds and model comparisons must use the same normalized dataset path.
+The official RNG key uses the dataloader-provided `im_file` string, usually an absolute path. Moving or renaming the dataset root therefore changes the degradation sequence, so all three seeds and model comparisons must use the same normalized dataset path.
 
 The paper fixes the image-formation order as sampling, blur, then shot noise:
 
@@ -181,7 +183,7 @@ lambda_consistency = 0.1
 p_drop = 0.25
 ```
 
-This implementation's `PIRSBFRLoss` averages the scale KL over clean and degraded views. The paper does not specify whether scale loss applies to one or both views, so this is an explicit repository choice.
+The official `PIRSBFRLoss` averages the scale KL over clean and degraded views. This is the canonical public training behavior.
 
 ## 5. Three-seed training
 
@@ -201,7 +203,7 @@ pir-train --data configs/datasets/dior.yaml --scale-mode dior --seed 2025
 
 The default run directories are `runs/pir_sbfr/dior_seed{2023,2024,2025}`.
 
-The full model reads `configs/pir_sbfr.yaml` by default. Pass a paper-ablation approximation explicitly, for example:
+The full model reads `configs/pir_sbfr.yaml` by default. Pass an official public ablation configuration explicitly, for example:
 
 ```bash
 pir-train \
@@ -211,7 +213,19 @@ pir-train \
   --seed 2023
 ```
 
-`configs/ablations/` provides A0, A1, A2, A3, A4, A5, A6, A9, and A10. The paper does not disclose the specific encoders required by A7 direct concatenation and A8 FiLM, so this repository does not fabricate those configurations.
+`configs/ablations/` provides the official public configurations for A0, A1, A2, A3, A4, A5, A6, A9, and A10. A7 direct concatenation and A8 FiLM are reported comparison controls but are not exposed as standalone YAML configurations in this release. A2 retains A1's paired degradation and adds scale supervision plus the P5 bypass, matching its role in Tables 10 and 11.
+
+Table 11's paired 2 × 2 experiment uses the four configurations under `configs/ablations/factorial/`:
+
+| Cell | Configuration | Scale supervision | P5 bypass | AP | `AP_S` | `AP_L` |
+|---|---|---:|---:|---:|---:|---:|
+| B0 | `b0_shared_baseline.yaml` | No | No | 63.37 ± 0.45 | 44.65 ± 0.45 | 70.84 ± 0.32 |
+| BS | `bs_scale_only.yaml` | Yes | No | 63.57 ± 0.44 | 45.10 ± 0.46 | 70.73 ± 0.32 |
+| BP | `bp_p5_only.yaml` | No | Yes | 63.48 ± 0.43 | 44.78 ± 0.44 | 70.93 ± 0.32 |
+| BSP | `bsp_joint.yaml` | Yes | Yes | 63.69 ± 0.43 | 45.21 ± 0.44 | 70.91 ± 0.31 |
+| Interaction | — | — | — | +0.01 ± 0.03 | -0.02 ± 0.02 | +0.09 ± 0.01 |
+
+All four inherit A1's paired degradation, optimizer schedule, and three-seed protocol. Only scale supervision and the bypass vary. The interaction row is computed with paper Equation (26).
 
 AI-TOD-v2:
 
@@ -296,7 +310,7 @@ pir-eval \
 
 Use `pir-eval --help` as the authority for CLI paths and optional output names. AP in the paper is COCO-style AP over IoU 0.50:0.95, not AP50.
 
-COCO inference defaults to `conf=0.001` and NMS IoU `0.70`; the visualization-oriented `pir-predict` defaults to `conf=0.25`. The paper does not disclose NMS/confidence details. Formal evaluation must use `pir-eval` or record explicit overrides, and the two defaults must not be mixed.
+The official evaluation path defaults to `conf=0.001` and NMS IoU `0.70`; the visualization-oriented `pir-predict` defaults to `conf=0.25`. Formal evaluation must use `pir-eval` or record explicit overrides, and the two defaults must not be mixed.
 
 Evaluate each of the three DIOR checkpoints:
 
@@ -351,7 +365,7 @@ The paper resamples two models jointly by image identifier with replacement. Rep
 ```bash
 python scripts/bootstrap_paired_coco.py \
   --annotations datasets/DIOR/annotations/test.json \
-  --predictions-a outputs/yolo_dsf_seed2023.json \
+  --predictions-a outputs/visual_only_seed2023.json \
   --predictions-b outputs/pir_full_seed2023.json \
   --area-mode dior \
   --dior-input-size 640 \
@@ -362,6 +376,17 @@ python scripts/bootstrap_paired_coco.py \
 ```
 
 The paper uses 10,000 replicates, seed `20260718`, and a 2.5%/97.5% percentile interval. Flight experiments resample complete videos rather than frames, but the source flight data is not public.
+
+Paper Table 16 reports the following DIOR contrasts against the internal visual-only baseline:
+
+| Metric | Mean change | Seed-paired 95% CI | Paired p | Bootstrap 95% CI | Bootstrap p |
+|---|---:|---:|---:|---:|---:|
+| AP | +2.54 | [1.12, 3.96] | 0.0165 | [1.78, 3.37] | 0.0017 |
+| AP50 | +2.61 | [0.90, 4.32] | 0.0225 | [1.72, 3.58] | 0.0028 |
+| AP75 | +3.08 | [0.87, 5.29] | 0.0268 | [2.07, 4.15] | 0.0013 |
+| `AP_S` | +3.53 | [1.16, 5.90] | 0.0236 | [2.51, 4.59] | 0.0007 |
+
+The seed-paired interval measures run-to-run variation over three common seeds. The image-paired bootstrap measures test-sample variation for a fixed model contrast; these uncertainty sources must not be conflated.
 
 ## 7. Robustness protocol
 
@@ -375,7 +400,7 @@ MTF = {0.50, 0.30, 0.15}
 SNR = {30, 20, 10} dB
 ```
 
-Average seeds 2023/2024/2025 within each cell. Across YOLOv11n, YOLO-DSF, and PIR-SBFR Full, the paper obtains 81 model-condition means. Reporting only the worst cell or a one-variable slice is insufficient.
+Average seeds 2023/2024/2025 within each cell. Across YOLOv11n, the internal visual-only baseline, and PIR-SBFR Full, the paper obtains 81 model-condition means. Reporting only the worst cell or a one-variable slice is insufficient.
 
 The 27 cells for one checkpoint can be evaluated after loading the model once:
 
@@ -412,25 +437,25 @@ for seed in 2023 2024 2025; do
 done
 ```
 
-Each baseline must also generate COCO predictions for identical cells and per-image degradation seeds. Evaluate them uniformly with `pir-eval --predictions BASELINE.json --annotations ... --dataset dior` to form the paper's 81 model-condition observations. The official YOLOv11n baseline training entry point is `scripts/train_yolo11n_baseline.py`. The paper's original YOLO-DSF is not bundled, so repository A0 is only an approximate baseline.
+Each baseline must also generate COCO predictions for identical cells and per-image degradation seeds. Evaluate them uniformly with `pir-eval --predictions BASELINE.json --annotations ... --dataset dior` to form the paper's 81 model-condition observations. The official YOLOv11n baseline training entry point is `scripts/train_yolo11n_baseline.py`, and `configs/ablations/a0_visual_only.yaml` is the internal visual-only baseline configuration.
 
 ### 7.2 Nine conditions outside the training distribution
 
-| Condition | Fixed setting | Exactly reconstructable? |
+| Condition | Fixed setting | Public regeneration behavior |
 |---|---|---|
-| disk defocus | radius 3 px | Approximate only; kernel rasterization and border handling are undisclosed |
-| motion blur | 9 px, random orientation | Requires a published/fixed per-image orientation seed |
-| anisotropic Gaussian | `sigma_x=2.5, sigma_y=0.6`, random orientation | Requires a published/fixed per-image orientation seed |
-| speckle | `sigma=0.12` | Approximate only; the exact multiplicative-noise definition is undisclosed |
-| stripe + read noise | amplitude 0.08, read-noise `sigma=0.02` | Approximate only; stripe orientation, frequency, and phase are undisclosed |
-| unseen GSD | 1.5x | Yes |
-| unseen GSD | 2.5x | Yes |
-| unseen GSD | 4x | Yes |
-| joint | 2.5x + unseen PSF + unseen noise | **No; the PSF orientation record is missing** |
+| disk defocus | radius 3 px | Deterministic official disk-kernel and reflection-border implementation |
+| motion blur | 9 px, random orientation | Deterministic for a fixed command seed; realized orientation is recorded |
+| anisotropic Gaussian | `sigma_x=2.5, sigma_y=0.6`, random orientation | Deterministic for a fixed command seed; realized orientation is recorded |
+| speckle | `sigma=0.12` | Deterministic official multiplicative-noise implementation |
+| stripe + read noise | amplitude 0.08, read-noise `sigma=0.02` | Deterministic official sinusoid-plus-read-noise implementation |
+| unseen GSD | 1.5x | Deterministic for a fixed command seed |
+| unseen GSD | 2.5x | Deterministic for a fixed command seed |
+| unseen GSD | 4x | Deterministic for a fixed command seed |
+| joint | 2.5x + unseen PSF + unseen noise | Deterministic for a fixed command seed; newly generated images are distinct from the non-redistributed archived realization |
 
 These conditions must not influence training, early stopping, hyperparameter selection, or model selection.
 
-Entry point for the nine approximate reconstructions:
+Official entry point for regenerating the nine OOD conditions:
 
 ```bash
 python scripts/evaluate_unseen.py \
@@ -442,7 +467,7 @@ python scripts/evaluate_unseen.py \
   --output-dir output/unseen/seed2023
 ```
 
-Each result records `approximate=true`, the realized random orientation, the equivalent MTF/SNR mapping, and all undisclosed boundaries.
+The eight single-family conditions follow the fully specified paper protocol. Only the regenerated joint condition records `approximate=true`, because the archived per-image PSF orientation was not retained. The flag describes that joint image realization, not the PIR-SBFR model or public implementation. Every output records the command seed, realized random orientation, and equivalent MTF/SNR mapping.
 
 ### 7.3 Mixed-degradation metadata controls
 
@@ -459,7 +484,7 @@ python scripts/metadata_controls.py \
   --output-dir output/metadata_controls/seed2023
 ```
 
-When the non-redistributed mixed set is unavailable, pass `--synthesize-controlled` to construct an explicitly labeled approximate set. The script covers Table 12's correct descriptors, +/-10/20/50% multiplicative errors, 25/50/100% missingness, training-set mean, and cross-image shuffling. It reports only within-set differences relative to the correct condition.
+When the non-redistributed mixed set is unavailable, pass `--synthesize-controlled` to construct a deterministic control surrogate labelled with `surrogate_input=true`. The script covers Table 12's correct descriptors, +/-10/20/50% multiplicative errors, 25/50/100% missingness, training-set mean, and cross-image shuffling. It reports only within-set differences relative to the correct condition and does not present generated samples as the archived samples behind the paper table.
 
 ## 8. Parameter, GFLOP, and latency calibration
 
@@ -468,8 +493,8 @@ Paper deployment anchors at 640 x 640:
 | Model | Params (M) | GFLOPs | FP16 latency (ms) | FPS | AP |
 |---|---:|---:|---:|---:|---:|
 | YOLOv11n | 2.584 | 6.47 | 2.347 | 426.1 | 57.31 |
-| YOLO-DSF | 3.628 | 8.43 | 3.079 | 324.8 | 62.98 |
-| DSF + scale supervision + P5 bypass | 3.691 | 8.51 | 3.117 | 320.8 | 63.69 |
+| Internal visual-only baseline | 3.628 | 8.43 | 3.079 | 324.8 | 62.98 |
+| Internal scaffold + scale supervision + P5 bypass | 3.691 | 8.51 | 3.117 | 320.8 | 63.69 |
 | PIR-SBFR Full | 3.942 | 8.82 | 3.313 | 301.8 | 65.52 |
 
 Direct THOP measurements for the repository's default `PIRSBFRModel(nc=20)` on a real 640 x 640 input:
@@ -480,7 +505,7 @@ THOP MACs = 4,417,637,728
 GFLOPs (2 x MACs) = 8.835275456
 ```
 
-Relative to the paper's Full model, this implementation has approximately 0.0026M more parameters and 0.0153 more direct-profiled GFLOPs at 640, a 0.17% difference. Ultralytics `get_flops(model,imgsz=640)` first profiles 32 x 32 and multiplies by 400 according to image area. This extrapolation incorrectly multiplies **per-image fixed costs**, including post-GAP fully connected layers and MoE gates/experts, by 400 and therefore returns an inflated 9.0798848 GFLOPs. Do not use that extrapolated value as the primary calibration result.
+The official release model profiles at 3.944613M parameters and 8.835275456 direct-profiled GFLOPs at 640. These values are 0.0026M and 0.0153G above the rounded 3.942M/8.82G paper entries, a 0.17% difference attributable to reporting precision and profiler convention. Ultralytics `get_flops(model,imgsz=640)` first profiles 32 x 32 and multiplies by 400 according to image area. This extrapolation incorrectly multiplies **per-image fixed costs**, including post-GAP fully connected layers and MoE gates/experts, by 400 and therefore returns an inflated 9.0798848 GFLOPs. Do not use that extrapolated value as the primary release measurement.
 
 GFLOPs still depend on how the profiler counts multiply-adds, interpolation, activations, and dynamic branches. Every report must state the input size, profiler name, and profiler version. Never alter only the displayed value to "match" the paper.
 
@@ -509,7 +534,20 @@ An Ultralytics trainer checkpoint contains a pickled model object. Use `--allow-
 
 The timing includes only the network forward and excludes disk access, image decoding, resize, host-to-device transfer, NMS, and serialization. Latency measured on different GPUs, power limits, drivers, or clock states should not be compared directly with the paper's RTX 4090 value.
 
-## 9. Minimum acceptance checklist
+## 9. Claim boundaries from paper Table 18
+
+The experiment suite supports bounded conclusions. Reports generated with this repository must preserve the paper's distinction between supported evidence and claims outside the study design.
+
+| Evidence block | Supported interpretation | Boundary |
+|---|---|---|
+| DIOR | effectiveness on a public benchmark with broad object scales | native-telemetry use and transfer to another sensor are not tested |
+| AI-TOD-v2 | effectiveness on a second dataset in the tiny-object regime | platform-independent and multi-sensor generalization are not established |
+| Paired 2 × 2 ablation | separate scale-supervision, P5-bypass, and interaction effects under one protocol | remaining losses and reliability terms are not independently factorized |
+| 27-condition grid | directional consistency across controlled GSD, MTF, and SNR changes | calibrated atmospheric, optical, and radiometric modeling is not evaluated |
+| Held-out operators and metadata controls | robustness beyond fitted operators and dependence on correctly paired descriptors | sensor-level causality and coverage of all natural degradations are not established |
+| Eight UAV videos | within-platform transfer across flights and unseen heights using recorded context | transfer across cameras, payloads, and acquisition platforms is not tested |
+
+## 10. Minimum acceptance checklist
 
 - [ ] Split image counts match paper Table 2.
 - [ ] All three seeds are trained from scratch, with configuration and environment saved.

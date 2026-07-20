@@ -1,0 +1,5 @@
+base: ../a1_degradation_augmentation.yaml
+model:
+  lambda_scale: 0.1
+  router:
+    p5_bypass: true

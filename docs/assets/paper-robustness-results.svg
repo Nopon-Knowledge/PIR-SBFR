@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
   <title id="title">Paper-reported robustness gains on unseen degradations</title>
-  <desc id="desc">Horizontal bars show PIR-SBFR AP gains over YOLO-DSF for nine degradation conditions excluded from training and model selection.</desc>
+  <desc id="desc">Horizontal bars show PIR-SBFR AP gains over the internal visual-only baseline for nine degradation conditions excluded from training and model selection.</desc>
   <defs>
     <linearGradient id="robustBg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#071526"/>
@@ -17,7 +17,7 @@
   <rect width="1600" height="900" rx="28" fill="url(#robustBg)"/>
   <circle cx="1450" cy="120" r="240" fill="#1cae9f" opacity="0.08"/>
   <text x="70" y="72" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" font-weight="700">Robustness beyond the training distribution</text>
-  <text x="70" y="111" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Paper Table 13: AP gain of PIR-SBFR Full over YOLO-DSF, in percentage points.</text>
+  <text x="70" y="111" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Paper Table 13: AP gain over the internal visual-only baseline, in percentage points.</text>
 
   <g filter="url(#robustShadow)">
     <rect x="65" y="145" width="240" height="72" rx="18" fill="#132946" stroke="#31587d" stroke-width="2"/>
@@ -42,7 +42,7 @@
   <g fill="#8197b8" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" text-anchor="middle">
     <text x="430" y="795">0</text><text x="680" y="795">2</text><text x="930" y="795">4</text><text x="1180" y="795">6</text><text x="1430" y="795">8</text>
   </g>
-  <text x="930" y="833" text-anchor="middle" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">AP gain over YOLO-DSF (percentage points)</text>
+  <text x="930" y="833" text-anchor="middle" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">AP gain over the internal visual-only baseline (percentage points)</text>
 
   <g fill="#c9d8eb" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" text-anchor="end">
     <text x="405" y="281">Defocus PSF</text>

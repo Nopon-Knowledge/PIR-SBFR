@@ -1,4 +1,4 @@
-"""DRFB backbone and FACH head blocks described in paper equations (3)-(6), (22)-(24)."""
+"""DRFB backbone and FACH head blocks described in paper equations (3)-(6), (23)-(25)."""
 
 from __future__ import annotations
 

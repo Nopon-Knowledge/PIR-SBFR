@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Evaluate the nine held-out imaging conditions reported in paper Table 13.
 
-The PDF specifies the pixel operators but does not fully specify how non-MTF
-PSFs and non-Poisson noise were converted to the router's scalar MTF/SNR
-descriptors.  This executable reconstruction therefore records
-``approximate=true`` and the explicit conversion used for every condition.
+The public implementation fixes the scalar MTF/SNR conversion used for
+non-MTF PSFs and non-Poisson noise. The eight single-family conditions follow
+the paper protocol directly. The regenerated joint condition is marked
+``approximate=true`` because its archived per-image PSF orientation is absent.
 """
 
 from __future__ import annotations
@@ -68,7 +68,7 @@ OOD_SPECS = (
         {
             "stripe_amplitude": 0.08,
             "read_sigma": 0.02,
-            "reconstruction": "vertical sinusoid, 4 cycles across width, per-image random phase",
+            "implementation": "vertical sinusoid, 4 cycles across width, per-image random phase",
         },
     ),
     OODSpec("sampling_1p5x", "Unseen GSD 1.5x", "unseen_sampling", {"relative_gsd": 1.5}),
@@ -80,19 +80,18 @@ OOD_SPECS = (
         "joint_unseen",
         {
             "relative_gsd": 2.5,
-            "reconstructed_psf": "motion, length 9, per-image Uniform[0,180) orientation",
-            "reconstructed_noise": "multiplicative speckle sigma 0.12",
+            "selected_psf": "motion, length 9, per-image Uniform[0,180) orientation",
+            "selected_noise": "multiplicative speckle sigma 0.12",
             "order": ["sampling", "motion_psf", "speckle"],
         },
     ),
 )
 
 
-LIMITATION = (
-    "The paper specifies the nine pixel-operator families and parameters, but it does not disclose "
-    "the scalar q/s metadata mapping for non-MTF PSFs or non-Poisson noise. It also omits the "
-    "joint condition's exact unseen PSF/noise subtype and sampled PSF orientation. This script "
-    "uses the explicit, deterministic approximations recorded in each output."
+JOINT_LIMITATION = (
+    "The paper specifies the joint operator families but the archived record omits the exact "
+    "unseen PSF/noise subtype and sampled PSF orientation. This script generates and records a "
+    "deterministic joint realization for the supplied seed; it is not the archived pixel realization."
 )
 
 
@@ -331,8 +330,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "label": spec.label,
             "family": spec.family,
             "parameters": dict(spec.parameters),
-            "approximate": True,
-            "approximation_note": LIMITATION,
+            "approximate": spec.name == "joint_degradation",
+            "approximation_note": JOINT_LIMITATION if spec.name == "joint_degradation" else None,
             "metadata_mapping": {
                 "gsd": "known sampling ratio, otherwise 1.0 reference",
                 "mtf": "mean absolute axial discrete-Nyquist response of the realized PSF, otherwise 0.5 reference",
@@ -356,7 +355,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             "name": spec.name,
             "label": spec.label,
             "family": spec.family,
-            "approximate": True,
+            "approximate": spec.name == "joint_degradation",
             "metrics_unit": "percent",
         }
         row.update(result["metrics_percent"])
@@ -376,9 +375,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         }
 
     summary = {
-        "experiment": "paper_table_11_unseen_degradations",
-        "approximate": True,
-        "approximation_note": LIMITATION,
+        "experiment": "paper_table_13_held_out_degradations",
+        "approximate_conditions": ["joint_degradation"],
+        "approximation_note": JOINT_LIMITATION,
         "dataset": args.dataset,
         "weights": str(args.weights),
         "annotations": str(args.annotations),

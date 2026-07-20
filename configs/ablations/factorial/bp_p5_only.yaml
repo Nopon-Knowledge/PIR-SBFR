@@ -1,0 +1,4 @@
+base: ../a1_degradation_augmentation.yaml
+model:
+  router:
+    p5_bypass: true

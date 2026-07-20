@@ -1,4 +1,4 @@
-"""PIR-SBFR routing neck from paper equations (11)-(19)."""
+"""PIR-SBFR routing neck from paper equations (12)-(20)."""
 
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ class ResidualExpert(nn.Module):
 
 
 class VisualResidualRouter(nn.Module):
-    """K-branch scale-supervised visual residual from equations (11)-(13)."""
+    """K-branch scale-supervised visual residual from equations (12)-(14)."""
 
     def __init__(
         self,
@@ -72,12 +72,12 @@ class PIRSBFRNeck(nn.Module):
     Args:
         in_channels: Backbone P3/P4/P5 channel counts.
         aligned_channels: Common channel count for ``A_i(P_i)``.
-        eta: Physical-prior logit strength from equation (16).
+        eta: Physical-prior logit strength from equation (17).
         temperature: Routing temperature ``tau``.
         physical_fields: Optional length-three mask for GSD/MTF/SNR ablations.
-        use_physical: Disable for the visual-only YOLO-DSF approximation.
+        use_physical: Disable for the internal visual-only baseline.
         use_visual: Disable for analytic-only ablations.
-        p5_bypass: Enable the unweighted coarse structural path in equation (19).
+        p5_bypass: Enable the unweighted coarse structural path in equation (20).
     """
 
     def __init__(

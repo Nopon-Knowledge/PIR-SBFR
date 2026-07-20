@@ -1,4 +1,4 @@
-"""Analytic physical-imaging reliability prior from paper equations (7)-(10)."""
+"""Analytic physical-imaging reliability prior from paper equations (7), (9)-(11)."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ class PhysicalReliabilityPrior(nn.Module):
         self.eps = float(eps)
 
     def degradation_coordinates(self, metadata: Tensor, availability: Optional[Tensor] = None) -> Tensor:
-        """Return non-negative ``[d_g, d_q, d_s]`` coordinates from equation (8)."""
+        """Return non-negative ``[d_g, d_q, d_s]`` coordinates from equation (9)."""
         if metadata.ndim != 2 or metadata.shape[-1] != 3:
             raise ValueError("metadata must have shape [batch, 3]")
         if availability is None:

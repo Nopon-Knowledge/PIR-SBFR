@@ -1,0 +1,3 @@
+base: ../a1_degradation_augmentation.yaml
+model:
+  lambda_scale: 0.1

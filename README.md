@@ -15,7 +15,7 @@ The official open-source implementation of *PIR-SBFR for Observation-Constrained
 This repository implements the model, paired-degradation training procedure, complete loss, DIOR and AI-TOD-v2 data conversion, paper-specific COCO evaluation, robustness experiments, metadata controls, statistical analysis, and deployment-oriented efficiency benchmarks described in the original PIR-SBFR paper. The paper PDF is not redistributed in this repository.
 
 > [!IMPORTANT]
-> This is the **official open-source codebase released by the PIR-SBFR paper authors**. It contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices used for the public release. Dataset files, the paper PDF, pretrained weights, and private flight data are not redistributed; see [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
+> This is the **official open-source codebase released by the PIR-SBFR paper authors**. It contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices used for the public release. Dataset files, the paper PDF, and private flight data are not redistributed. Pretrained weights and training checkpoints **cannot be publicly released under the institutional regulations governing this work**. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
 
 ## Table of contents
 
@@ -50,9 +50,9 @@ This repository implements the model, paired-degradation training procedure, com
 | Training objective | Complete | YOLO detection loss, scale KL, and shared-positive class/box consistency |
 | Dataset conversion | Complete | DIOR VOC and AI-TOD-v2 COCO to YOLO, COCO ground truth, category mapping, and audit report |
 | Paper-aligned evaluation | Complete | COCOeval with dataset-specific scale intervals and maximum-detection limits |
-| Robustness experiments | Complete | 27-cell grid, nine approximate OOD conditions, metadata controls, paired bootstrap |
+| Robustness experiments | Complete | 27-cell grid, nine held-out OOD conditions, metadata controls, paired bootstrap |
 | Efficiency measurement | Complete | Parameter count, direct `640×640` FLOPs, and CUDA FP16 batch-1 forward latency |
-| Pretrained weights | Not included | Train from scratch with the documented three-seed protocol |
+| Pretrained weights | Restricted | Cannot be publicly released under institutional regulations; train from scratch with the documented protocol |
 
 ### Parameter and compute calibration
 
@@ -68,13 +68,13 @@ This close agreement verifies that the released implementation matches the model
 ## Paper-reported results
 
 > [!NOTE]
-> These charts are original redraws of the current paper's Figure 5 and Tables 6, 7, 13, and 17; the observation-grid summary comes from Figure 8. All accuracy values are percentages and all deltas are percentage points. AP entries with uncertainty are three-seed means ± sample SD. These are published results, not measurements from the randomly initialized repository model.
+> These charts are original redraws of the current paper's Figure 5 and Tables 6, 7, 13, and 17; the observation-grid summary comes from Figure 8, and statistical intervals come from Table 16. All accuracy values are percentages and all deltas are percentage points. AP entries with uncertainty are three-seed means ± sample SD. These are published results, not measurements from the randomly initialized repository model.
 
 ![Paper-reported accuracy and efficiency results](docs/assets/paper-results-overview.svg)
 
 ### Benchmark accuracy
 
-| Dataset and metric | YOLOv11n | YOLO-DSF | PIR-SBFR Full | Delta vs. YOLO-DSF | Source |
+| Dataset and metric | YOLOv11n | Internal visual-only baseline | PIR-SBFR Full | Delta vs. internal baseline | Source |
 | --- | ---: | ---: | ---: | ---: | --- |
 | DIOR AP | 57.31 ± 0.47 | 62.98 ± 0.43 | **65.52 ± 0.42** | **+2.54** | Table 6 |
 | DIOR `AP_S` | 38.64 | 44.08 | **47.61** | **+3.53** | Table 6 |
@@ -88,17 +88,17 @@ The paper measures forward-only FP16 inference with batch size 1 at `640 × 640`
 | Model | Params (M) | GFLOPs | Peak VRAM (GB) | FP16 size (MB) | Latency (ms) | FPS | DIOR AP |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | YOLOv11n | 2.584 | 6.47 | 0.721 | 5.17 | 2.347 | 426.1 | 57.31 |
-| YOLO-DSF | 3.628 | 8.43 | 0.858 | 7.28 | 3.079 | 324.8 | 62.98 |
-| DSF + scale supervision + P5 bypass | 3.691 | 8.51 | 0.872 | 7.41 | 3.117 | 320.8 | 63.69 |
+| Internal visual-only baseline | 3.628 | 8.43 | 0.858 | 7.28 | 3.079 | 324.8 | 62.98 |
+| Internal scaffold + scale supervision + P5 bypass | 3.691 | 8.51 | 0.872 | 7.41 | 3.117 | 320.8 | 63.69 |
 | **PIR-SBFR Full** | 3.942 | 8.82 | 0.903 | 7.90 | 3.313 | 301.8 | **65.52** |
 
-Relative to YOLO-DSF, PIR-SBFR Full adds 0.314 M parameters (+8.65%) and 0.39 GFLOPs (+4.63%). These values are reported in Table 17.
+Relative to the internal visual-only baseline, PIR-SBFR Full adds 0.314 M parameters (+8.65%) and 0.39 GFLOPs (+4.63%). These values are reported in Table 17.
 
 ![Paper-reported robustness results](docs/assets/paper-robustness-results.svg)
 
 ### Held-out degradation robustness
 
-| Held-out condition | YOLO-DSF AP | PIR-SBFR AP | Delta AP |
+| Held-out condition | Internal baseline AP | PIR-SBFR AP | Delta AP |
 | --- | ---: | ---: | ---: |
 | Defocus PSF | 51.58 | 55.21 | **+3.63** |
 | Motion PSF | 49.65 | 53.17 | **+3.52** |
@@ -112,6 +112,19 @@ Relative to YOLO-DSF, PIR-SBFR Full adds 0.314 M parameters (+8.65%) and 0.39 GF
 | **Mean / worst** | **46.95 / 29.60** | **51.32 / 36.97** | **+4.37 / +7.37** |
 
 Table 13 reports positive gains for all nine held-out conditions. Figure 8 reports positive gains in all 27 cells of the controlled GSD-MTF-SNR grid, spanning +2.54 to +10.23 points with a mean gain of +7.66 points.
+
+### Statistical support
+
+Table 16 separates training-run uncertainty from test-sample uncertainty. Every reported interval excludes zero.
+
+| Metric | Mean change | Seed-paired 95% CI | Paired p | Bootstrap 95% CI | Bootstrap p |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| AP | **+2.54** | [1.12, 3.96] | 0.0165 | [1.78, 3.37] | 0.0017 |
+| AP50 | **+2.61** | [0.90, 4.32] | 0.0225 | [1.72, 3.58] | 0.0028 |
+| AP75 | **+3.08** | [0.87, 5.29] | 0.0268 | [2.07, 4.15] | 0.0013 |
+| `AP_S` | **+3.53** | [1.16, 5.90] | 0.0236 | [2.51, 4.59] | 0.0007 |
+
+Figure 9 reports positive class-wise AP50 changes for 17 of 20 DIOR categories. Table 18 bounds the conclusions to the tested public benchmarks, controlled observation grid, held-out operators, and one within-platform flight collection; it does not claim calibrated sensor physics or cross-platform generalization.
 
 ## Method overview
 
@@ -182,7 +195,7 @@ The formula-to-code mapping is available in [`docs/PAPER_SPEC.md`](docs/PAPER_SP
 - Original-image coordinate restoration after letterboxing.
 - DIOR and AI-TOD-v2 scale-specific COCO metrics.
 - GSD × MTF × SNR robustness grid.
-- Approximate unseen PSF, noise, and sampling conditions.
+- Fully specified held-out PSF, noise, and sampling conditions, plus an explicitly labelled regenerated joint realization.
 - Correct, missing, shuffled, constant, and noisy metadata controls.
 - Image-paired COCO bootstrap and three-seed summaries.
 - Routing-weight probes, direct FLOPs, and FP16 latency measurement.
@@ -526,7 +539,7 @@ Exact interval definitions and reporting conventions are documented in [`REPRODU
 | Parameter and direct FLOP profile | `python scripts/model_info.py --nc 20 --imgsz 640` | standard output |
 | CUDA FP16 batch-1 forward latency | `python scripts/benchmark.py --help` | user-selected JSON |
 
-For nonstandard OOD operators, the public scripts record each PSF orientation, stripe frequency, and scalar-metadata mapping explicitly. Runs that depart from the paper protocol are written with `approximate=true` and should be reported as additional stress tests rather than paper-matched results.
+For held-out OOD operators, the public scripts record each PSF orientation, stripe frequency, and scalar-metadata mapping explicitly. The eight fully specified single-family conditions are paper-protocol evaluations. Only a regenerated joint condition is written with `approximate=true`, because the archived per-image PSF orientation is not available. Synthetic metadata-control inputs are labelled with `surrogate_input=true`.
 
 ## Configuration and ablations
 
@@ -542,15 +555,27 @@ All ablations inherit from the main configuration through a `base` field.
 
 | Configuration | Main change |
 | --- | --- |
-| `a0_yolo_dsf.yaml` | Visual route approximation; no physical prior, degradation, scale loss, P5 bypass, or consistency loss |
+| `a0_visual_only.yaml` | Internal visual-only baseline; no physical prior, degradation, scale loss, P5 bypass, or consistency loss |
 | `a1_degradation_augmentation.yaml` | Adds paired degradation to A0 |
-| `a2_scale_p5.yaml` | Visual route, scale loss, and P5 bypass |
+| `a2_scale_p5.yaml` | A1 plus scale supervision and the P5 bypass |
 | `a3_gsd.yaml` | GSD-only analytic prior |
 | `a4_mtf.yaml` | MTF-only analytic prior |
 | `a5_snr.yaml` | SNR-only analytic prior |
 | `a6_analytic_all.yaml` | Full GSD/MTF/SNR analytic prior without the visual residual route |
 | `a9_no_consistency.yaml` | Complete dual-source route with consistency loss disabled |
 | `a10_full.yaml` | Full PIR-SBFR configuration |
+
+The paired 2 × 2 experiment in Table 11 is available under [`configs/ablations/factorial/`](configs/ablations/factorial/):
+
+| Configuration | Scale supervision | P5 bypass | AP | `AP_S` | `AP_L` |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `b0_shared_baseline.yaml` (B0) | No | No | 63.37 ± 0.45 | 44.65 ± 0.45 | 70.84 ± 0.32 |
+| `bs_scale_only.yaml` (BS) | Yes | No | 63.57 ± 0.44 | 45.10 ± 0.46 | 70.73 ± 0.32 |
+| `bp_p5_only.yaml` (BP) | No | Yes | 63.48 ± 0.43 | 44.78 ± 0.44 | 70.93 ± 0.32 |
+| `bsp_joint.yaml` (BSP) | Yes | Yes | 63.69 ± 0.43 | 45.21 ± 0.44 | 70.91 ± 0.31 |
+| Paired interaction | — | — | +0.01 ± 0.03 | -0.02 ± 0.02 | +0.09 ± 0.01 |
+
+All four cells retain A1's degradation augmentation, seeds 2023–2025, and training protocol. Only scale supervision and the P5 bypass vary. The final row is the paired factorial interaction from paper Equation (26).
 
 Example ablation run:
 
@@ -645,22 +670,22 @@ PIR-SBFR/
 
 This repository is the official public implementation of PIR-SBFR. The released source code and configurations define the model architecture, training objective, metadata handling, dataset conversion, evaluation protocol, ablations, and robustness tools.
 
-The repository intentionally does not bundle third-party datasets, private flight imagery and metadata, the paper PDF, or pretrained checkpoints. Nonstandard OOD runs marked with `approximate=true` are optional stress tests outside the exact paper-matched protocol.
+The repository intentionally does not bundle third-party datasets, private flight imagery and metadata, or the paper PDF. Pretrained weights and training checkpoints cannot be publicly released under the institutional regulations governing this work. A regenerated joint OOD condition marked with `approximate=true` and metadata controls marked with `surrogate_input=true` must be distinguished from the non-redistributed archived evaluation inputs.
 
 Public reports should clearly separate:
 
 1. numbers reported in the paper;
 2. results produced by full training on the complete datasets with this repository;
-3. smoke-test or `approximate=true` results.
+3. smoke-test, synthetic-surrogate, or regenerated-joint results.
 
-Do not report random-initialization output, a tiny smoke dataset, or approximate OOD runs as reproduced paper accuracy.
+Do not report random-initialization output, a tiny smoke dataset, a synthetic metadata-control surrogate, or a regenerated joint OOD realization as the archived paper accuracy.
 
 ## Troubleshooting
 
 <details>
 <summary><strong>Why are pretrained weights not included?</strong></summary>
 
-Pretrained checkpoints are not bundled with this source release, and local training weights are excluded from version control. Train from scratch with the fixed three-seed protocol, or publish a checkpoint separately with its provenance, configuration, commit ID, and dataset license clearly stated.
+Pretrained weights and training checkpoints cannot be publicly released under the institutional regulations governing this work. They are therefore excluded from the repository and will not be provided through a separate public download. Train from scratch with the fixed three-seed protocol; locally generated checkpoints remain subject to the applicable institutional and dataset rules.
 
 </details>
 
