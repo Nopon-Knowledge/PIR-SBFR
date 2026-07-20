@@ -318,8 +318,7 @@ def prepare_aitodv2(
     }
     # Validate and convert every annotation before creating any destination files.
     prepared_splits = {
-        split_name: _prepare_annotations(split, coco_to_yolo, include_crowd)
-        for split_name, split in splits.items()
+        split_name: _prepare_annotations(split, coco_to_yolo, include_crowd) for split_name, split in splits.items()
     }
 
     summary: dict[str, Any] = {

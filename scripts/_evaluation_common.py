@@ -127,9 +127,7 @@ def run_transformed_coco(
 
         values_batch: List[Sequence[float]] = []
         masks_batch: List[Sequence[float]] = []
-        for record, path, clean, transformed in zip(
-            record_batch, paths, clean_prepared, transformed_prepared
-        ):
+        for record, path, clean, transformed in zip(record_batch, paths, clean_prepared, transformed_prepared):
             values, mask = descriptor_provider(record, path, clean, transformed)
             if len(values) != 3 or len(mask) != 3:
                 raise ValueError("descriptor values and availability masks must each have length three")
@@ -146,9 +144,7 @@ def run_transformed_coco(
             iou=iou,
             max_det=max_det,
         )
-        for index, (record, detections, info) in enumerate(
-            zip(record_batch, detections_batch, original_infos)
-        ):
+        for index, (record, detections, info) in enumerate(zip(record_batch, detections_batch, original_infos)):
             detections = detections.clone()
             if detections.numel():
                 detections[:, :4] = restore_boxes(detections[:, :4], info)
@@ -208,9 +204,7 @@ def write_csv(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
 def metric_payload(metrics: Mapping[str, float]) -> Dict[str, Any]:
     return {
         "metrics": dict(metrics),
-        "metrics_percent": {
-            key: (None if value < 0.0 else 100.0 * float(value)) for key, value in metrics.items()
-        },
+        "metrics_percent": {key: (None if value < 0.0 else 100.0 * float(value)) for key, value in metrics.items()},
     }
 
 

@@ -130,8 +130,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     if not annotation_files:
         searched = args.annotations_dir if args.annotations_dir.is_absolute() else source / args.annotations_dir
         _parser().error(
-            f"no annotation JSON found under {searched}; pass at least one of "
-            "--train-json/--val-json/--test-json"
+            f"no annotation JSON found under {searched}; pass at least one of --train-json/--val-json/--test-json"
         )
 
     summary = prepare_aitodv2(

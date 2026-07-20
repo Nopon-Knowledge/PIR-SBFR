@@ -122,9 +122,7 @@ def remap_paired_coco_sample(
     predictions_b_by_image = _index_by_image_id(predictions_b)
 
     remapped_ground_truth = {
-        key: copy.deepcopy(value)
-        for key, value in ground_truth.items()
-        if key not in {"images", "annotations"}
+        key: copy.deepcopy(value) for key, value in ground_truth.items() if key not in {"images", "annotations"}
     }
     remapped_ground_truth.setdefault("info", {})
     remapped_ground_truth.setdefault("licenses", [])

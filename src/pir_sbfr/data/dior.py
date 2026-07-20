@@ -176,9 +176,7 @@ def _parse_xml(
         ymax = min(float(height), max(0.0, ymax))
         box_width, box_height = xmax - xmin, ymax - ymin
         if box_width <= 0 or box_height <= 0:
-            raise ValueError(
-                f"Degenerate bbox ({xmin}, {ymin}, {xmax}, {ymax}) in {xml_path} object {object_number}"
-            )
+            raise ValueError(f"Degenerate bbox ({xmin}, {ymin}, {xmax}, {ymax}) in {xml_path} object {object_number}")
         objects.append(
             DiorObject(
                 category_index=_CLASS_TO_INDEX[class_key],
@@ -241,8 +239,7 @@ def _coco_document(split: str, images: list[DiorImage]) -> dict[str, Any]:
         "images": coco_images,
         "annotations": coco_annotations,
         "categories": [
-            {"id": index + 1, "name": name, "supercategory": "object"}
-            for index, name in enumerate(DIOR_CLASSES)
+            {"id": index + 1, "name": name, "supercategory": "object"} for index, name in enumerate(DIOR_CLASSES)
         ],
     }
 
@@ -284,9 +281,7 @@ def prepare_dior(
     else:
         if not split_id_files:
             raise ValueError("At least one DIOR split must be supplied")
-        split_paths = {
-            split: resolve_input_path(Path(path), source_root) for split, path in split_id_files.items()
-        }
+        split_paths = {split: resolve_input_path(Path(path), source_root) for split, path in split_id_files.items()}
     unsupported = set(split_paths) - {"train", "val", "test"}
     if unsupported:
         raise ValueError(f"Unsupported DIOR splits: {sorted(unsupported)}")

@@ -99,12 +99,8 @@ class PIRSBFRLoss:
         batch_size = pred_scores.shape[0]
         dtype = pred_scores.dtype
         image_size = torch.tensor(feats[0].shape[2:], device=pred_scores.device, dtype=dtype) * self.det.stride[0]
-        targets = torch.cat(
-            (batch["batch_idx"].view(-1, 1), batch["cls"].view(-1, 1), batch["bboxes"]), dim=1
-        )
-        targets = self.det.preprocess(
-            targets.to(self.det.device), batch_size, scale_tensor=image_size[[1, 0, 1, 0]]
-        )
+        targets = torch.cat((batch["batch_idx"].view(-1, 1), batch["cls"].view(-1, 1), batch["bboxes"]), dim=1)
+        targets = self.det.preprocess(targets.to(self.det.device), batch_size, scale_tensor=image_size[[1, 0, 1, 0]])
         gt_labels, gt_boxes = targets.split((1, 4), dim=2)
         mask_gt = gt_boxes.sum(dim=2, keepdim=True).gt_(0.0)
         _, _, _, foreground, _ = self.det.assigner(
@@ -137,9 +133,7 @@ class PIRSBFRLoss:
         q_log = F.log_softmax(degraded_scores[foreground], dim=-1)
         p = p_log.exp()
         q = q_log.exp()
-        symmetric_kl = 0.5 * (
-            (p * (p_log - q_log)).sum(dim=-1) + (q * (q_log - p_log)).sum(dim=-1)
-        )
+        symmetric_kl = 0.5 * ((p * (p_log - q_log)).sum(dim=-1) + (q * (q_log - p_log)).sum(dim=-1))
 
         image_h, image_w = batch["img"].shape[-2:]
         normalizer = clean_boxes.new_tensor([image_w, image_h, image_w, image_h]).view(1, 1, 4)
@@ -174,9 +168,7 @@ class PIRSBFRLoss:
                     target_scale, clean_aux["scale_estimate"], self.eps
                 )
                 total = total + batch_size * scale_value
-            return total, torch.cat(
-                (clean_items, scale_value.detach().view(1), clean_det.detach().new_zeros(1))
-            )
+            return total, torch.cat((clean_items, scale_value.detach().view(1), clean_det.detach().new_zeros(1)))
 
         degraded_det, degraded_items = self.det(degraded_preds, batch)
         detection = 0.5 * (clean_det + degraded_det)

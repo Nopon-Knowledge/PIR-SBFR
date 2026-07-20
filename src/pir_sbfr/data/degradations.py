@@ -248,7 +248,6 @@ def controlled_degradation(
 
 
 def disk_psf(image: np.ndarray, radius: int = 3) -> np.ndarray:
-    size = radius * 2 + 1
     yy, xx = np.ogrid[-radius : radius + 1, -radius : radius + 1]
     kernel = ((xx * xx + yy * yy) <= radius * radius).astype(np.float32)
     kernel /= kernel.sum()

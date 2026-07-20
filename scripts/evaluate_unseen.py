@@ -147,9 +147,7 @@ def _disk_kernel(radius: int) -> np.ndarray:
 def _motion_kernel(length: int, angle_degrees: float) -> np.ndarray:
     kernel = np.zeros((length, length), dtype=np.float32)
     kernel[length // 2, :] = 1.0
-    matrix = cv2.getRotationMatrix2D(
-        (length / 2.0 - 0.5, length / 2.0 - 0.5), angle_degrees, 1.0
-    )
+    matrix = cv2.getRotationMatrix2D((length / 2.0 - 0.5, length / 2.0 - 0.5), angle_degrees, 1.0)
     kernel = cv2.warpAffine(kernel, matrix, (length, length), flags=cv2.INTER_LINEAR)
     return kernel / max(float(kernel.sum()), np.finfo(np.float32).eps)
 
@@ -194,9 +192,7 @@ def _stripe_read(
     source = _float_image(image)
     width = source.shape[1]
     phase = float(rng.uniform(0.0, 2.0 * math.pi))
-    stripe = amplitude * np.sin(
-        np.linspace(0.0, 8.0 * math.pi, width, dtype=np.float32) + phase
-    )
+    stripe = amplitude * np.sin(np.linspace(0.0, 8.0 * math.pi, width, dtype=np.float32) + phase)
     read = rng.normal(0.0, read_sigma, source.shape).astype(np.float32)
     result = np.clip(source + stripe[None, :, None] + read, 0.0, 1.0).astype(np.float32)
     return result, phase
@@ -224,9 +220,7 @@ def _apply_spec(
         result = anisotropic_psf(source, sigma_x=2.5, sigma_y=0.6, angle_degrees=angle)
         realization.update(
             orientation_degrees=angle,
-            equivalent_nyquist_mtf=_equivalent_nyquist_mtf(
-                _anisotropic_kernel(2.5, 0.6, angle)
-            ),
+            equivalent_nyquist_mtf=_equivalent_nyquist_mtf(_anisotropic_kernel(2.5, 0.6, angle)),
         )
     elif spec.name == "speckle_noise":
         result = speckle_noise(source, sigma=0.12, rng=rng)
@@ -313,9 +307,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         )
         for route in routing:
             route["transform_realization"] = realized[route["image_id"]]
-        routing_path.write_text(
-            json.dumps(routing, ensure_ascii=False), encoding="utf-8"
-        )
+        routing_path.write_text(json.dumps(routing, ensure_ascii=False), encoding="utf-8")
         metrics = evaluate_coco(
             args.annotations,
             predictions,
@@ -346,9 +338,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         }
         result.update(metric_payload(metrics))
         metrics_path.parent.mkdir(parents=True, exist_ok=True)
-        metrics_path.write_text(
-            json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-        )
+        metrics_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         condition_results.append(result)
         row: Dict[str, Any] = {
             "index": index,
@@ -396,9 +386,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "conditions": condition_results,
     }
     summary_path = args.output_dir / "summary.json"
-    summary_path.write_text(
-        json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     write_csv(args.output_dir / "summary.csv", csv_rows)
     print(json.dumps({"summary": str(summary_path), "conditions": len(condition_results)}, indent=2))
     return 0
