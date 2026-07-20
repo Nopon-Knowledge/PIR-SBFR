@@ -110,9 +110,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         }
         result.update(metric_payload(metrics))
         metrics_path.parent.mkdir(parents=True, exist_ok=True)
-        metrics_path.write_text(
-            json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-        )
+        metrics_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         cells.append(result)
         row: Dict[str, Any] = {
             "cell": cell_index,
@@ -147,9 +145,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "cells": cells,
     }
     summary_path = args.output_dir / "summary.json"
-    summary_path.write_text(
-        json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     write_csv(args.output_dir / "summary.csv", csv_rows)
     print(json.dumps({"summary": str(summary_path), "cells": len(cells)}, indent=2))
     return 0

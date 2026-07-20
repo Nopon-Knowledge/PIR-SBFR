@@ -46,7 +46,5 @@ def test_disabling_p5_bypass_removes_projection_parameters():
     with_bypass = PIRSBFRNeck(p5_bypass=True)
     without_bypass = PIRSBFRNeck(p5_bypass=False)
     assert without_bypass.p5_projection is None
-    difference = sum(p.numel() for p in with_bypass.parameters()) - sum(
-        p.numel() for p in without_bypass.parameters()
-    )
+    difference = sum(p.numel() for p in with_bypass.parameters()) - sum(p.numel() for p in without_bypass.parameters())
     assert difference == 66_048

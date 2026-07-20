@@ -46,12 +46,7 @@ def safe_relative_path(value: str, description: str) -> Path:
     normalized = value.replace("\\", "/")
     path = Path(normalized)
     has_drive_prefix = bool(path.parts and path.parts[0].endswith(":"))
-    if (
-        not value
-        or path.is_absolute()
-        or has_drive_prefix
-        or any(part in ("", ".", "..") for part in path.parts)
-    ):
+    if not value or path.is_absolute() or has_drive_prefix or any(part in ("", ".", "..") for part in path.parts):
         raise ValueError(f"Unsafe {description}: {value!r}")
     return path
 

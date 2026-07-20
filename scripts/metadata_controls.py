@@ -92,14 +92,10 @@ def _identity(image: np.ndarray, _record, _rng) -> np.ndarray:
     return image
 
 
-def _sample_synthetic_conditions(
-    records: Sequence[Mapping[str, Any]], seed: int
-) -> Dict[Any, DegradationCondition]:
+def _sample_synthetic_conditions(records: Sequence[Mapping[str, Any]], seed: int) -> Dict[Any, DegradationCondition]:
     grid = [
         DegradationCondition(gsd, mtf, snr)
-        for gsd, mtf, snr in itertools.product(
-            (1.0, 2.0, 3.0), (0.5, 0.3, 0.15), (30.0, 20.0, 10.0)
-        )
+        for gsd, mtf, snr in itertools.product((1.0, 2.0, 3.0), (0.5, 0.3, 0.15), (30.0, 20.0, 10.0))
         if (gsd, mtf, snr) != REFERENCE
     ]
     sampled: Dict[Any, DegradationCondition] = {}
@@ -127,21 +123,15 @@ def _load_base_descriptors(
         descriptors[record["id"]] = (tuple(values), tuple(mask))
     if missing:
         preview = ", ".join(missing[:5])
-        raise ValueError(
-            f"base metadata has no record for {len(missing)} COCO images (first: {preview})"
-        )
+        raise ValueError(f"base metadata has no record for {len(missing)} COCO images (first: {preview})")
     return descriptors
 
 
-def _available_mean(
-    descriptors: Mapping[Any, Tuple[Sequence[float], Sequence[float]]]
-) -> Tuple[float, float, float]:
+def _available_mean(descriptors: Mapping[Any, Tuple[Sequence[float], Sequence[float]]]) -> Tuple[float, float, float]:
     result = []
     for field in range(3):
         values = [
-            float(descriptor[0][field])
-            for descriptor in descriptors.values()
-            if float(descriptor[1][field]) > 0.0
+            float(descriptor[0][field]) for descriptor in descriptors.values() if float(descriptor[1][field]) > 0.0
         ]
         if not values:
             raise ValueError(f"cannot estimate metadata mean: field {field} is always unavailable")
@@ -162,9 +152,9 @@ def _build_control_descriptors(
     training_mean: Sequence[float],
     seed: int,
 ) -> Dict[str, Dict[Any, Tuple[Tuple[float, float, float], Tuple[float, float, float]]]]:
-    variants: Dict[
-        str, Dict[Any, Tuple[Tuple[float, float, float], Tuple[float, float, float]]]
-    ] = {"correct": dict(base)}
+    variants: Dict[str, Dict[Any, Tuple[Tuple[float, float, float], Tuple[float, float, float]]]] = {
+        "correct": dict(base)
+    }
 
     for percent in (10, 20, 50):
         name = f"multiplicative_error_{percent}pct"
@@ -194,21 +184,15 @@ def _build_control_descriptors(
         variants[name] = controls
 
     constant = _clamp_descriptor(training_mean)
-    variants["training_set_mean"] = {
-        image_id: (constant, (1.0, 1.0, 1.0)) for image_id in base
-    }
+    variants["training_set_mean"] = {image_id: (constant, (1.0, 1.0, 1.0)) for image_id in base}
 
     image_ids = list(base)
     if len(image_ids) < 2:
         raise ValueError("cross-image shuffled metadata requires at least two images")
     rng = np.random.default_rng(stable_seed(seed, "cross_image_shuffled", len(image_ids)))
     order = list(np.asarray(image_ids, dtype=object)[rng.permutation(len(image_ids))])
-    source_for_target = {
-        order[position]: order[(position + 1) % len(order)] for position in range(len(order))
-    }
-    variants["cross_image_shuffled"] = {
-        target: base[source_for_target[target]] for target in image_ids
-    }
+    source_for_target = {order[position]: order[(position + 1) % len(order)] for position in range(len(order))}
+    variants["cross_image_shuffled"] = {target: base[source_for_target[target]] for target in image_ids}
     return variants
 
 
@@ -224,10 +208,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     synthetic_conditions: Dict[Any, DegradationCondition] = {}
     if args.synthesize_controlled:
         synthetic_conditions = _sample_synthetic_conditions(records, args.seed)
-        base = {
-            record["id"]: (synthetic_conditions[record["id"]].metadata, (1.0, 1.0, 1.0))
-            for record in records
-        }
+        base = {record["id"]: (synthetic_conditions[record["id"]].metadata, (1.0, 1.0, 1.0)) for record in records}
         source_mode = "generated_synthetic_mixed_degradation"
     else:
         assert args.metadata is not None
@@ -243,6 +224,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     variants = _build_control_descriptors(base, training_mean, args.seed)
 
     if args.synthesize_controlled:
+
         def transform(image, record, rng):
             return controlled_degradation(image, synthetic_conditions[record["id"]], rng)
     else:
@@ -316,9 +298,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         }
         result.update(payload)
         metrics_path.parent.mkdir(parents=True, exist_ok=True)
-        metrics_path.write_text(
-            json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-        )
+        metrics_path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         results.append(result)
         row: Dict[str, Any] = {
             "index": index,
@@ -374,9 +354,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "conditions": results,
     }
     summary_path = args.output_dir / "summary.json"
-    summary_path.write_text(
-        json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-    )
+    summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     write_csv(args.output_dir / "summary.csv", csv_rows)
     print(json.dumps({"summary": str(summary_path), "conditions": len(results)}, indent=2))
     return 0

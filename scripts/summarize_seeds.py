@@ -99,17 +99,13 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     common = set.intersection(*(set(record) for record in candidate))
     result: Dict[str, object] = {
         "candidate_files": [str(path) for path in args.candidate],
-        "candidate": {
-            key: _summary([record[key] for record in candidate]) for key in sorted(common)
-        },
+        "candidate": {key: _summary([record[key] for record in candidate]) for key in sorted(common)},
     }
     if args.reference is not None:
         reference: List[Dict[str, float]] = [_metrics(path) for path in args.reference]
         paired_keys = common & set.intersection(*(set(record) for record in reference))
         result["reference_files"] = [str(path) for path in args.reference]
-        result["reference"] = {
-            key: _summary([record[key] for record in reference]) for key in sorted(paired_keys)
-        }
+        result["reference"] = {key: _summary([record[key] for record in reference]) for key in sorted(paired_keys)}
         result["paired_contrast"] = {
             key: _paired_summary(
                 [record[key] for record in reference],

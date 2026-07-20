@@ -68,9 +68,7 @@ def test_dior_converter_maps_difficult_to_coco_ignore(tmp_path):
         output_name="one.jpg",
         width=640,
         height=640,
-        objects=(
-            DiorObject(category_index=0, bbox=(4.0, 5.0, 16.0, 16.0), difficult=1, truncated=0),
-        ),
+        objects=(DiorObject(category_index=0, bbox=(4.0, 5.0, 16.0, 16.0), difficult=1, truncated=0),),
     )
     annotation = _coco_document("test", [image])["annotations"][0]
     assert annotation["difficult"] == 1

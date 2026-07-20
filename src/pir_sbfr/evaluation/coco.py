@@ -267,9 +267,7 @@ def _letterbox_area_scales(coco_gt: COCO, image_size: int) -> Dict[Any, float]:
         width = image.get("width")
         height = image.get("height")
         if width is None or height is None:
-            raise ValueError(
-                f"DIOR area normalization needs width and height for image_id={image_id!r}"
-            )
+            raise ValueError(f"DIOR area normalization needs width and height for image_id={image_id!r}")
         if float(width) <= 0.0 or float(height) <= 0.0:
             raise ValueError(f"image_id={image_id!r} has invalid dimensions {width!r} x {height!r}")
         gain = min(float(image_size) / float(width), float(image_size) / float(height))
@@ -349,9 +347,7 @@ def evaluate_coco(
     configured_max_detections = list(protocol.max_detections)
     if max_detections is not None:
         if int(max_detections) <= configured_max_detections[-2]:
-            raise ValueError(
-                f"max_detections must exceed the protocol diagnostic cap {configured_max_detections[-2]}"
-            )
+            raise ValueError(f"max_detections must exceed the protocol diagnostic cap {configured_max_detections[-2]}")
         configured_max_detections[-1] = int(max_detections)
     coco_gt = load_coco_ground_truth(ground_truth, quiet=quiet)
     area_scales: Optional[Mapping[Any, float]] = None

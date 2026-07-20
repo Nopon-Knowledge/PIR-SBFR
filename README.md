@@ -5,7 +5,7 @@ The official open-source implementation of *PIR-SBFR for Observation-Constrained
 ![Python 3.9–3.12](https://img.shields.io/badge/Python-3.9--3.12-3776AB?logo=python&logoColor=white)
 ![PyTorch 2.8.0](https://img.shields.io/badge/PyTorch-2.8.0-EE4C2C?logo=pytorch&logoColor=white)
 ![Ultralytics 8.3.0](https://img.shields.io/badge/Ultralytics-8.3.0-111F68)
-![Tests](https://img.shields.io/badge/tests-23%20passed-2EA44F)
+[![CI](https://github.com/Nopon-Knowledge/PIR-SBFR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Nopon-Knowledge/PIR-SBFR/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 **[Paper-to-code specification](docs/PAPER_SPEC.md) · [Reproducibility protocol](REPRODUCIBILITY.md)**

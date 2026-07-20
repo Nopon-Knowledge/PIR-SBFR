@@ -66,11 +66,7 @@ def letterbox_rgb(image_rgb: np.ndarray, size: int = 640) -> Tuple[np.ndarray, L
     if image_rgb.ndim != 3 or image_rgb.shape[2] != 3:
         raise ValueError("expected HWC RGB image")
     if np.issubdtype(image_rgb.dtype, np.floating):
-        if (
-            not np.isfinite(image_rgb).all()
-            or float(image_rgb.min()) < 0.0
-            or float(image_rgb.max()) > 1.0
-        ):
+        if not np.isfinite(image_rgb).all() or float(image_rgb.min()) < 0.0 or float(image_rgb.max()) > 1.0:
             raise ValueError("floating RGB images must be finite and normalized to [0,1]")
         padding_value = (114.0 / 255.0,) * 3
     elif np.issubdtype(image_rgb.dtype, np.integer):
@@ -104,9 +100,7 @@ def letterbox_rgb(image_rgb: np.ndarray, size: int = 640) -> Tuple[np.ndarray, L
 def image_tensor_rgb(image_rgb: np.ndarray, device: torch.device) -> Tensor:
     """Convert integer RGB or normalized float RGB to one float CHW tensor."""
     if np.issubdtype(image_rgb.dtype, np.floating) and (
-        not np.isfinite(image_rgb).all()
-        or float(image_rgb.min()) < 0.0
-        or float(image_rgb.max()) > 1.0
+        not np.isfinite(image_rgb).all() or float(image_rgb.min()) < 0.0 or float(image_rgb.max()) > 1.0
     ):
         raise ValueError("floating RGB images must be finite and normalized to [0,1]")
     array = np.ascontiguousarray(image_rgb.transpose(2, 0, 1))

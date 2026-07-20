@@ -172,9 +172,7 @@ class PIRSBFRNeck(nn.Module):
 
         routing_logits = (delta_vis + physical_logits) / self.temperature
         routing_weights = torch.softmax(routing_logits, dim=-1)
-        reweighted = [
-            3.0 * routing_weights[:, i].view(-1, 1, 1, 1) * feature for i, feature in enumerate(aligned)
-        ]
+        reweighted = [3.0 * routing_weights[:, i].view(-1, 1, 1, 1) * feature for i, feature in enumerate(aligned)]
         f3, f4, f5 = self.fpn_pan(reweighted)
         if self.p5_bypass:
             if self.p5_projection is None:
