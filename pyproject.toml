@@ -5,11 +5,19 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pir-sbfr"
 version = "0.1.0"
-description = "Reproduction of PIR-SBFR for robust optical remote-sensing object detection"
+description = "Official implementation of PIR-SBFR for observation-constrained multiscale evidence allocation"
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
 license = {text = "MIT"}
-authors = [{name = "PIR-SBFR reproduction"}]
+authors = [
+  {name = "Zizheng Zhao"},
+  {name = "Jingchao Liu"},
+  {name = "Zixin Wang"},
+  {name = "Xiaoyu Dong"},
+  {name = "Zhirui Xue"},
+  {name = "Junhao Hu"},
+  {name = "Chengxin Zhu"},
+]
 dependencies = [
   "numpy>=1.24,<2.0",
   "opencv-python>=4.8,<5",

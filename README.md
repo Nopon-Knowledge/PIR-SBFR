@@ -8,7 +8,7 @@ The official open-source implementation of *PIR-SBFR for Observation-Constrained
 ![Tests](https://img.shields.io/badge/tests-23%20passed-2EA44F)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-**[Paper-to-code specification](docs/PAPER_SPEC.md) · [Experiment reproduction protocol](REPRODUCIBILITY.md)**
+**[Paper-to-code specification](docs/PAPER_SPEC.md) · [Reproducibility protocol](REPRODUCIBILITY.md)**
 
 ![PIR-SBFR architecture](docs/assets/pir-sbfr-architecture.svg)
 
@@ -195,7 +195,21 @@ The formula-to-code mapping is available in [`docs/PAPER_SPEC.md`](docs/PAPER_SP
 - A CUDA-capable NVIDIA GPU is strongly recommended for full training.
 - CPU and Apple MPS are suitable for unit tests, forward passes, and small smoke runs.
 
-### Editable development installation
+### Runtime installation
+
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+python -m pip install --no-deps -e .
+```
+
+[`requirements.txt`](requirements.txt) contains the complete runtime dependency set and mirrors `[project].dependencies` in [`pyproject.toml`](pyproject.toml). The final editable install registers the `pir-train`, `pir-predict`, and `pir-eval` commands without resolving the same dependencies a second time.
+
+### Development installation
+
+For tests, coverage, and linting, install the package with its development extras instead:
 
 ```bash
 python3.11 -m venv .venv
@@ -338,6 +352,18 @@ The default optimization objective is:
   + \lambda_{\mathrm{cons}}\mathcal{L}_{\mathrm{cons}}
 ```
 
+### Configuration map
+
+| Purpose | Configuration | What it controls |
+| --- | --- | --- |
+| DIOR main experiment | [`configs/pir_sbfr.yaml`](configs/pir_sbfr.yaml) | model, routing, paired degradation, and loss weights |
+| AI-TOD-v2 main experiment | [`configs/pir_sbfr_aitodv2.yaml`](configs/pir_sbfr_aitodv2.yaml) | inherits the main configuration and selects AI-TOD-v2 scale targets |
+| Dataset locations | [`configs/datasets/`](configs/datasets/) | static DIOR and AI-TOD-v2 dataset descriptors |
+| Paper ablations | [`configs/ablations/`](configs/ablations/) | component switches for the reported ablation variants |
+| Optimizer and augmentation schedule | [`src/pir_sbfr/training/trainer.py`](src/pir_sbfr/training/trainer.py) | paper-fixed settings and explicitly pinned Ultralytics defaults |
+
+The YAML selected by `--config` controls PIR-SBFR-specific behavior. CLI flags select the dataset, seed, device, and run location, while `paper_train_overrides()` supplies the fixed optimization and augmentation schedule. The resolved PIR configuration is saved as `pir_config.yaml` in every run directory.
+
 ### One paper seed on DIOR
 
 ```bash
@@ -358,20 +384,30 @@ pir-train \
   --device 0
 ```
 
-### Default main-experiment schedule
+### Default main-experiment configuration
 
-| Setting | Value |
-| --- | ---: |
-| Epochs | 200 |
-| Input size | 640 |
-| Source batch size | 16 |
-| Optimizer | SGD |
-| Initial learning rate | 0.005 |
-| Seeds | 2023 / 2024 / 2025 |
-| Pretrained | false |
-| Deterministic | true |
-| Metadata dropout | 0.25 |
-| `λscale` / `λcons` | 0.1 / 0.1 |
+| Group | Setting | Value |
+| --- | --- | --- |
+| Run | Epochs / input size | 200 / 640 × 640 |
+| Run | Source batch size | 16; each source produces one clean and one degraded forward pass |
+| Run | Seeds | 2023, 2024, 2025 |
+| Run | Initialization / early stopping | from scratch / disabled |
+| Run | AMP / deterministic mode / workers | enabled / enabled / 8 |
+| Optimizer | Optimizer | SGD |
+| Optimizer | Initial LR / final LR ratio | 0.005 / 0.01 with linear decay |
+| Optimizer | Momentum / weight decay | 0.937 / `5e-4` |
+| Optimizer | Warmup | 3 epochs; momentum 0.8; bias LR 0.1 |
+| Detection loss | Box / class / DFL gains | 7.5 / 0.5 / 1.5 |
+| Augmentation | Mosaic | probability 1.0; disabled for the final 20 epochs |
+| Augmentation | HSV h/s/v gains | 0.015 / 0.70 / 0.40 |
+| Augmentation | Scale / translation / horizontal flip | 0.50 / 0.10 / 0.50 |
+| Augmentation | Disabled transforms | vertical flip, rotation, shear, perspective, MixUp, Copy-Paste |
+| Paired degradation | Blur-only / noise-only / joint probabilities | 0.35 / 0.35 / 0.30 |
+| Paired degradation | MTF / SNR ranges | `[0.15, 0.45]` / `[10, 28]` dB |
+| PIR-SBFR | Metadata dropout | 0.25 independently per GSD/MTF/SNR field |
+| PIR-SBFR | Scale / consistency loss weights | 0.1 / 0.1 |
+
+The initial LR, warmup duration, optimizer, augmentation, and main seeds follow the paper protocol. Framework-level values not reported in the paper—such as the final LR ratio, warmup momentum, loss gains, AMP, and worker count—are pinned explicitly so future library defaults cannot silently alter a run. [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) records the complete protocol and distinguishes paper-reported values from implementation choices.
 
 ### Run all three seeds
 
@@ -600,7 +636,8 @@ PIR-SBFR/
 │   ├── coco_inference.py
 │   └── inference.py
 ├── tests/                     Unit and integration smoke tests
-├── REPRODUCIBILITY.md         End-to-end experiment reproduction guide
+├── REPRODUCIBILITY.md         End-to-end reproducibility guide
+├── requirements.txt           Pinned and bounded runtime dependencies
 └── pyproject.toml             Package metadata, dependencies, and CLI entry points
 ```
 

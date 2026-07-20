@@ -46,7 +46,7 @@ class ConvBNAct(nn.Module):
 class DRFB(nn.Module):
     """Dilated Receptive Field Block.
 
-    ``Conv_cat`` is not specified in the PDF. This reproduction uses a 1x1
+    ``Conv_cat`` is not specified in the PDF. This implementation uses a 1x1
     compression from C concatenated channels to C/2, followed by the explicitly
     stated C/2-to-C projection and identity addition.
     """

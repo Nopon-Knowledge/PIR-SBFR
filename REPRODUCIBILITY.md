@@ -1,8 +1,8 @@
-# PIR-SBFR Reproduction Protocol
+# PIR-SBFR Reproducibility Protocol
 
 This document provides a complete execution path from public-data preparation and three-seed training through evaluation, paired bootstrap analysis, and deployment-efficiency calibration. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) for the equation-by-equation mapping between the paper and this implementation.
 
-## 1. Reproduction scope
+## 1. Protocol scope
 
 Interpret results and experiment records using three distinct categories:
 
