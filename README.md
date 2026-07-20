@@ -124,7 +124,7 @@ Their logits are fused before a softmax produces scale weights:
 
 ```math
 \displaystyle
-\mathbf{w} = \operatorname{softmax}\!\left(
+\mathbf{w} = \mathrm{softmax}\!\left(
   \frac{\Delta_{\mathrm{vis}} + \eta \log \mathbf{\rho}_{\mathrm{phy}}}{\tau}
 \right)
 ```
