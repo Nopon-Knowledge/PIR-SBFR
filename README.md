@@ -15,7 +15,7 @@ The official open-source implementation of *PIR-SBFR for Observation-Constrained
 This repository implements the model, paired-degradation training procedure, complete loss, DIOR and AI-TOD-v2 data conversion, paper-specific COCO evaluation, robustness experiments, metadata controls, statistical analysis, and deployment-oriented efficiency benchmarks described in the original PIR-SBFR paper. The paper PDF is not redistributed in this repository.
 
 > [!IMPORTANT]
-> This is the **official open-source codebase released by the PIR-SBFR paper authors**. It contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices used for the public release. Dataset files, the paper PDF, pretrained weights, and private flight data are not redistributed; see [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
+> This is the **official open-source codebase released by the PIR-SBFR paper authors**. It contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices used for the public release. Dataset files, the paper PDF, and private flight data are not redistributed. Pretrained weights and training checkpoints **cannot be publicly released under the institutional regulations governing this work**. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
 
 ## Table of contents
 
@@ -52,7 +52,7 @@ This repository implements the model, paired-degradation training procedure, com
 | Paper-aligned evaluation | Complete | COCOeval with dataset-specific scale intervals and maximum-detection limits |
 | Robustness experiments | Complete | 27-cell grid, nine approximate OOD conditions, metadata controls, paired bootstrap |
 | Efficiency measurement | Complete | Parameter count, direct `640×640` FLOPs, and CUDA FP16 batch-1 forward latency |
-| Pretrained weights | Not included | Train from scratch with the documented three-seed protocol |
+| Pretrained weights | Restricted | Cannot be publicly released under institutional regulations; train from scratch with the documented protocol |
 
 ### Parameter and compute calibration
 
@@ -645,7 +645,7 @@ PIR-SBFR/
 
 This repository is the official public implementation of PIR-SBFR. The released source code and configurations define the model architecture, training objective, metadata handling, dataset conversion, evaluation protocol, ablations, and robustness tools.
 
-The repository intentionally does not bundle third-party datasets, private flight imagery and metadata, the paper PDF, or pretrained checkpoints. Nonstandard OOD runs marked with `approximate=true` are optional stress tests outside the exact paper-matched protocol.
+The repository intentionally does not bundle third-party datasets, private flight imagery and metadata, or the paper PDF. Pretrained weights and training checkpoints cannot be publicly released under the institutional regulations governing this work. Nonstandard OOD runs marked with `approximate=true` are optional stress tests outside the exact paper-matched protocol.
 
 Public reports should clearly separate:
 
@@ -660,7 +660,7 @@ Do not report random-initialization output, a tiny smoke dataset, or approximate
 <details>
 <summary><strong>Why are pretrained weights not included?</strong></summary>
 
-Pretrained checkpoints are not bundled with this source release, and local training weights are excluded from version control. Train from scratch with the fixed three-seed protocol, or publish a checkpoint separately with its provenance, configuration, commit ID, and dataset license clearly stated.
+Pretrained weights and training checkpoints cannot be publicly released under the institutional regulations governing this work. They are therefore excluded from the repository and will not be provided through a separate public download. Train from scratch with the fixed three-seed protocol; locally generated checkpoints remain subject to the applicable institutional and dataset rules.
 
 </details>
 

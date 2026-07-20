@@ -17,6 +17,8 @@ Two reported evaluations depend on artifacts that are not redistributed:
 - **Real flight experiments:** the eight videos, annotations, and synchronized altitude/attitude/IMU records remain private research data.
 - **Archived joint OOD realization:** the paper reports "2.5x sampling + unseen PSF + unseen noise," but the exact per-image PSF realization used for the reported table is not included in the repository.
 
+Pretrained weights and training checkpoints are a separate restricted release artifact. They cannot be publicly distributed under the institutional regulations governing this work. All commands below therefore use checkpoints produced by local training runs; the documented three-seed protocol is the supported path for obtaining them.
+
 The mixed-degradation metadata-control images and their per-image manifest are also not redistributed. The official scripts provide deterministic protocol-equivalent generation paths for new evaluations, but a newly generated sample set should not be presented as the archived sample set used for the paper's numerical table.
 
 ## 2. Environment

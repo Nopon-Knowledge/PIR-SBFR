@@ -24,9 +24,9 @@ For release-level components that the paper summarizes at method level, the offi
 - FACH expert count, `J_j`, `C_coupled`, cross-level sharing, and classification/regression tower details;
 - cross-view positive matching and the class-probability definition used by consistency KL.
 
-The following experiment artifacts are not redistributed in the public repository and are treated as data-availability boundaries rather than implementation gaps:
+The following experiment artifacts are not redistributed in the public repository and are treated as data-availability or release-policy boundaries rather than implementation gaps:
 
-- pretrained checkpoints;
+- pretrained weights and training checkpoints, which cannot be publicly released under the institutional regulations governing this work;
 - sample-level degradation records for the mixed-degradation control;
 - private flight videos, annotations, and telemetry;
 - the joint-OOD PSF orientation.
@@ -636,7 +636,7 @@ Base code repository directly cited by the paper:
 
 - Jocher, G.; Qiu, J. *Ultralytics YOLO11, Version 11.0.0* (2024): `https://github.com/ultralytics/ultralytics`
 
-The same repository is also used for the paper's YOLOv8 citation. This repository is the official PIR-SBFR release; a separate YOLO-DSF checkpoint and source package are not bundled.
+The same repository is also used for the paper's YOLOv8 citation. This repository is the official PIR-SBFR release. Model weights and training checkpoints, including YOLO-DSF checkpoints, cannot be publicly distributed under the institutional regulations governing this work.
 
 Related method references:
 
