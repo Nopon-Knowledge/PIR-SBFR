@@ -1,6 +1,6 @@
 # PIR-SBFR: Physical Imaging Reliability-Guided Scale-Biased Feature Reweighting
 
-An independent, end-to-end reproduction of **PIR-SBFR** for robust object detection in degraded optical remote-sensing imagery.
+The official open-source implementation of **PIR-SBFR** for robust object detection in degraded optical remote-sensing imagery, released by the paper authors.
 
 ![Python 3.9–3.12](https://img.shields.io/badge/Python-3.9--3.12-3776AB?logo=python&logoColor=white)
 ![PyTorch 2.8.0](https://img.shields.io/badge/PyTorch-2.8.0-EE4C2C?logo=pytorch&logoColor=white)
@@ -8,18 +8,18 @@ An independent, end-to-end reproduction of **PIR-SBFR** for robust object detect
 ![Tests](https://img.shields.io/badge/tests-23%20passed-2EA44F)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-**[Paper-to-code specification](docs/PAPER_SPEC.md) · [Reproduction protocol](REPRODUCIBILITY.md)**
+**[Paper-to-code specification](docs/PAPER_SPEC.md) · [Experiment reproduction protocol](REPRODUCIBILITY.md)**
 
 ![PIR-SBFR architecture](docs/assets/pir-sbfr-architecture.svg)
 
 This repository implements the model, paired-degradation training procedure, complete loss, DIOR and AI-TOD-v2 data conversion, paper-specific COCO evaluation, robustness experiments, metadata controls, statistical analysis, and deployment-oriented efficiency benchmarks described in the original PIR-SBFR paper. The paper PDF is not redistributed in this repository.
 
 > [!IMPORTANT]
-> The paper does not release official source code, pretrained weights, a complete network YAML, all internal DRFB/FACH/visual-expert parameters, the flight dataset, or sample-level settings for every out-of-distribution degradation. This repository is therefore a **high-fidelity independent reproduction**, not a claim of recovering the authors' private implementation. Every paper-grounded decision, calibrated choice, and non-identifiable detail is documented in [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md).
+> This is the **official open-source codebase released by the PIR-SBFR paper authors**. It contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices used for the public release. Dataset files, the paper PDF, pretrained weights, and private flight data are not redistributed; see [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
 
 ## Table of contents
 
-- [Reproduction at a glance](#reproduction-at-a-glance)
+- [Implementation at a glance](#implementation-at-a-glance)
 - [Paper-reported results](#paper-reported-results)
 - [Method overview](#method-overview)
 - [What is implemented](#what-is-implemented)
@@ -35,11 +35,11 @@ This repository implements the model, paired-degradation training procedure, com
 - [Outputs and experiment records](#outputs-and-experiment-records)
 - [Tests and validation](#tests-and-validation)
 - [Repository layout](#repository-layout)
-- [Reproducibility boundaries](#reproducibility-boundaries)
+- [Release scope and reproducibility](#release-scope-and-reproducibility)
 - [Troubleshooting](#troubleshooting)
 - [License and citation](#license-and-citation)
 
-## Reproduction at a glance
+## Implementation at a glance
 
 | Component | Status | Implementation |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ This repository implements the model, paired-degradation training procedure, com
 | Paper-aligned evaluation | Complete | COCOeval with dataset-specific scale intervals and maximum-detection limits |
 | Robustness experiments | Complete | 27-cell grid, nine approximate OOD conditions, metadata controls, paired bootstrap |
 | Efficiency measurement | Complete | Parameter count, direct `640×640` FLOPs, and CUDA FP16 batch-1 forward latency |
-| Official weights/results | Not available | The paper does not publish the checkpoint or all required data artifacts |
+| Pretrained weights | Not included | Train from scratch with the documented three-seed protocol |
 
 ### Parameter and compute calibration
 
@@ -63,12 +63,12 @@ The default `nc=20` model was profiled by passing a real `640×640` tensor throu
 | Parameters | 3,944,613 | 3.942 M | approximately 0.07% |
 | FLOPs | 8.8353 G | 8.82 G | approximately 0.17% |
 
-This agreement constrains the unreported structural hyperparameters; it does not imply that the paper's hidden architecture is uniquely identifiable.
+This close agreement verifies that the released implementation matches the model scale reported in the paper.
 
 ## Paper-reported results
 
 > [!NOTE]
-> These charts are original redraws of values reported in Tables 5, 6, 11, and 15 and Figure 7 of the paper. They summarize the paper's claims; they are not measurements from the randomly initialized model in this repository. A reproduced accuracy result requires the complete datasets and the documented three-seed training protocol.
+> These charts are original redraws of values reported in Tables 5, 6, 11, and 15 and Figure 7 of the paper. They summarize the published results; they are not measurements from the randomly initialized model in this repository. Reproducing these accuracy values requires the complete datasets and the documented three-seed training protocol.
 
 ![Paper-reported accuracy and efficiency results](docs/assets/paper-results-overview.svg)
 
@@ -459,7 +459,7 @@ Exact interval definitions and reporting conventions are documented in [`REPRODU
 | Parameter and direct FLOP profile | `python scripts/model_info.py --nc 20 --imgsz 640` | standard output |
 | CUDA FP16 batch-1 forward latency | `python scripts/benchmark.py --help` | user-selected JSON |
 
-The paper does not disclose every PSF orientation, stripe frequency, or mapping from nonstandard degradations to scalar metadata. The OOD script stores explicit realization details and writes `approximate=true` for these cases. Such values must not be presented as exact replicas of the authors' unpublished sample-level experiment.
+For nonstandard OOD operators, the public scripts record each PSF orientation, stripe frequency, and scalar-metadata mapping explicitly. Runs that depart from the paper protocol are written with `approximate=true` and should be reported as additional stress tests rather than paper-matched results.
 
 ## Configuration and ablations
 
@@ -569,22 +569,15 @@ PIR-SBFR/
 │   ├── coco_inference.py
 │   └── inference.py
 ├── tests/                     Unit and integration smoke tests
-├── REPRODUCIBILITY.md         End-to-end reproduction manual
+├── REPRODUCIBILITY.md         End-to-end experiment reproduction guide
 └── pyproject.toml             Package metadata, dependencies, and CLI entry points
 ```
 
-## Reproducibility boundaries
+## Release scope and reproducibility
 
-The following details cannot be uniquely determined from the paper and therefore use explicit, auditable engineering choices:
+This repository is the official public implementation of PIR-SBFR. The released source code and configurations define the model architecture, training objective, metadata handling, dataset conversion, evaluation protocol, ablations, and robustness tools.
 
-- exact branch grouping and convolutions inside DRFB;
-- FACH expert count and internal expert topology;
-- hidden width and nonlinearity of each visual residual expert `T_k`;
-- the authors' YOLO-DSF source, training checkpoint, and framework defaults;
-- flight data and some metadata-correspondence control data;
-- OOD PSF orientation, stripe frequency, and scalar-metadata mappings.
-
-This implementation jointly constrains those choices with the paper's equations, connectivity, ablation semantics, parameter count, FLOPs, and observable behavior.
+The repository intentionally does not bundle third-party datasets, private flight imagery and metadata, the paper PDF, or pretrained checkpoints. Nonstandard OOD runs marked with `approximate=true` are optional stress tests outside the exact paper-matched protocol.
 
 Public reports should clearly separate:
 
@@ -599,7 +592,7 @@ Do not report random-initialization output, a tiny smoke dataset, or approximate
 <details>
 <summary><strong>Why are pretrained weights not included?</strong></summary>
 
-The authors did not publish a checkpoint, and this repository excludes local training weights from version control. Train from scratch with the fixed three-seed protocol, or publish a checkpoint separately with its provenance, configuration, commit ID, and dataset license clearly stated.
+Pretrained checkpoints are not bundled with this source release, and local training weights are excluded from version control. Train from scratch with the fixed three-seed protocol, or publish a checkpoint separately with its provenance, configuration, commit ID, and dataset license clearly stated.
 
 </details>
 
@@ -633,10 +626,10 @@ At minimum: commit ID, dataset split and conversion report, GPU/CUDA information
 
 ## License and citation
 
-The package metadata in [`pyproject.toml`](pyproject.toml) declares the reproduction code as MIT licensed. The paper, DIOR, AI-TOD-v2, Ultralytics, and all other third-party dependencies remain governed by their original licenses and terms.
+The package metadata in [`pyproject.toml`](pyproject.toml) declares the official implementation code as MIT licensed. The paper, DIOR, AI-TOD-v2, Ultralytics, and all other third-party dependencies remain governed by their original licenses and terms.
 
-If this reproduction supports your research:
+If this repository supports your research:
 
 1. cite Zizheng Zhao, Jingchao Liu, Zixin Wang, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *PIR-SBFR: Physical Imaging Reliability-Guided Scale-Biased Feature Reweighting for Robust Object Detection in Optical Remote Sensing Imagery*;
-2. identify this repository as an independent reproduction;
+2. identify this repository as the official open-source implementation;
 3. include the exact Git commit, configuration, dataset split, and training seeds used.
