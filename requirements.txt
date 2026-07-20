@@ -1,0 +1,12 @@
+# Runtime dependencies for the official PIR-SBFR implementation.
+# Keep this file synchronized with [project].dependencies in pyproject.toml.
+numpy>=1.24,<2.0
+opencv-python>=4.8,<5
+Pillow>=10,<12
+PyYAML>=6,<7
+pycocotools>=2.0.7,<2.1
+scipy>=1.10,<1.14
+torch==2.8.0
+torchvision==0.23.0
+ultralytics-thop>=2.0.0,<3
+ultralytics==8.3.0

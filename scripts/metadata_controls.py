@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the complete Table 10 metadata-correspondence controls on one COCO set.
+"""Run the complete Table 12 metadata-correspondence controls on one COCO set.
 
 For the closest reproduction, provide the already mixed-degraded images and
 their per-image descriptors with ``--metadata``.  The paper's mixed control set

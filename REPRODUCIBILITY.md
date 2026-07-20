@@ -1,8 +1,8 @@
-# PIR-SBFR Reproduction Protocol
+# PIR-SBFR Reproducibility Protocol
 
 This document provides a complete execution path from public-data preparation and three-seed training through evaluation, paired bootstrap analysis, and deployment-efficiency calibration. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) for the equation-by-equation mapping between the paper and this implementation.
 
-## 1. Reproduction scope
+## 1. Protocol scope
 
 Interpret results and experiment records using three distinct categories:
 
@@ -140,7 +140,7 @@ The paper provides only the initial learning rate and warmup duration. It does n
 
 Each source image produces one clean view and one degraded view at a 1:1 ratio. The two detection losses are averaged before one optimizer update.
 
-clean reference：
+clean reference:
 
 ```text
 relative GSD = 1
@@ -148,7 +148,7 @@ MTF = 0.50
 SNR = 30 dB
 ```
 
-degraded view：
+degraded view:
 
 | Mode | Probability | Relative GSD | MTF | SNR |
 |---|---:|---:|---:|---:|
@@ -156,7 +156,7 @@ degraded view：
 | noise only | 0.35 | 1 | reference 0.50 | `U(10, 28)` dB |
 | blur + noise | 0.30 | 1 | `U(0.15, 0.45)` | `U(10, 28)` dB |
 
-A dash in paper Table 2 means that the corresponding operator is not applied; its descriptor value uses the clean reference. Each GSD/MTF/SNR field is independently masked with `p_drop=0.25`. Relative GSD remains 1 during training. Resolution changes, motion blur, disk PSF, anisotropic blur, speckle noise, and stripe noise are not used for training.
+A dash in paper Table 3 means that the corresponding operator is not applied; its descriptor value uses the clean reference. Each GSD/MTF/SNR field is independently masked with `p_drop=0.25`. Relative GSD remains 1 during training. Resolution changes, motion blur, disk PSF, anisotropic blur, speckle noise, and stripe noise are not used for training.
 
 The current `PairedDegradationGenerator` shares one field-level dropout mask across a clean/degraded pair so the consistency loss does not also mix different missingness patterns. The paper does not state whether the views share a mask, so this is an implementation choice. Gaussian blur uses reflection padding; the paper does not specify boundary handling.
 
@@ -191,7 +191,7 @@ Inspect the final CLI arguments first:
 pir-train --help
 ```
 
-DIOR：
+DIOR:
 
 ```bash
 pir-train --data configs/datasets/dior.yaml --scale-mode dior --seed 2023
@@ -213,7 +213,7 @@ pir-train \
 
 `configs/ablations/` provides A0, A1, A2, A3, A4, A5, A6, A9, and A10. The paper does not disclose the specific encoders required by A7 direct concatenation and A8 FiLM, so this repository does not fabricate those configurations.
 
-AI-TOD-v2：
+AI-TOD-v2:
 
 ```bash
 pir-train --data configs/datasets/aitodv2.yaml --scale-mode aitodv2 --seed 2023
@@ -273,7 +273,7 @@ When `availability` is omitted, the CLI derives the mask from the presence of `g
 
 ### 6.2 COCO-style evaluation
 
-DIOR：
+DIOR:
 
 ```bash
 pir-eval \
@@ -283,7 +283,7 @@ pir-eval \
   --dataset dior
 ```
 
-AI-TOD-v2：
+AI-TOD-v2:
 
 ```bash
 pir-eval \
@@ -340,7 +340,7 @@ When comparing two models, pass three `--reference` files in the same seed order
 Scale intervals:
 
 - DIOR: small `[0,32^2)`, medium `[32^2,96^2)`, and large `[96^2,+inf)`, measured as pixel area on the 640 x 640 model input.
-- AI-TOD-v2：very-tiny `[2^2,8^2)`、tiny `[8^2,16^2)`、small `[16^2,32^2)`、medium `[32^2,64^2)`。
+- AI-TOD-v2: very-tiny `[2^2,8^2)`, tiny `[8^2,16^2)`, small `[16^2,32^2)`, medium `[32^2,64^2)`.
 
 DIOR COCO ground truth retains original-image coordinates. Before applying the 32^2/96^2 thresholds, the evaluator multiplies GT/DT diagnostic area by `gain^2`, where the letterbox gain is `min(640/width,640/height)`. Box matching remains in original-image coordinates. Default `maxDets` values are `[1,10,100]` for DIOR and `[1,100,1500]` for AI-TOD-v2. The latter must not use COCO's 100-detection cap.
 
@@ -375,7 +375,7 @@ MTF = {0.50, 0.30, 0.15}
 SNR = {30, 20, 10} dB
 ```
 
-Average seeds 2023/2024/2025 within each cell. Across YOLO11n, YOLO-DSF, and PIR-SBFR Full, the paper obtains 81 model-condition means. Reporting only the worst cell or a one-variable slice is insufficient.
+Average seeds 2023/2024/2025 within each cell. Across YOLOv11n, YOLO-DSF, and PIR-SBFR Full, the paper obtains 81 model-condition means. Reporting only the worst cell or a one-variable slice is insufficient.
 
 The 27 cells for one checkpoint can be evaluated after loading the model once:
 
@@ -412,7 +412,7 @@ for seed in 2023 2024 2025; do
 done
 ```
 
-Each baseline must also generate COCO predictions for identical cells and per-image degradation seeds. Evaluate them uniformly with `pir-eval --predictions BASELINE.json --annotations ... --dataset dior` to form the paper's 81 model-condition observations. The official YOLO11n baseline training entry point is `scripts/train_yolo11n_baseline.py`. The paper's original YOLO-DSF is not public, so repository A0 is only an approximate baseline.
+Each baseline must also generate COCO predictions for identical cells and per-image degradation seeds. Evaluate them uniformly with `pir-eval --predictions BASELINE.json --annotations ... --dataset dior` to form the paper's 81 model-condition observations. The official YOLOv11n baseline training entry point is `scripts/train_yolo11n_baseline.py`. The paper's original YOLO-DSF is not bundled, so repository A0 is only an approximate baseline.
 
 ### 7.2 Nine conditions outside the training distribution
 
@@ -459,7 +459,7 @@ python scripts/metadata_controls.py \
   --output-dir output/metadata_controls/seed2023
 ```
 
-When the unpublished mixed set is unavailable, pass `--synthesize-controlled` to construct an explicitly labeled approximate set. The script covers Table 10's correct descriptors, +/-10/20/50% multiplicative errors, 25/50/100% missingness, training-set mean, and cross-image shuffling. It reports only within-set differences relative to the correct condition.
+When the non-redistributed mixed set is unavailable, pass `--synthesize-controlled` to construct an explicitly labeled approximate set. The script covers Table 12's correct descriptors, +/-10/20/50% multiplicative errors, 25/50/100% missingness, training-set mean, and cross-image shuffling. It reports only within-set differences relative to the correct condition.
 
 ## 8. Parameter, GFLOP, and latency calibration
 
@@ -467,7 +467,7 @@ Paper deployment anchors at 640 x 640:
 
 | Model | Params (M) | GFLOPs | FP16 latency (ms) | FPS | AP |
 |---|---:|---:|---:|---:|---:|
-| YOLO11n | 2.584 | 6.47 | 2.347 | 426.1 | 57.31 |
+| YOLOv11n | 2.584 | 6.47 | 2.347 | 426.1 | 57.31 |
 | YOLO-DSF | 3.628 | 8.43 | 3.079 | 324.8 | 62.98 |
 | DSF + scale supervision + P5 bypass | 3.691 | 8.51 | 3.117 | 320.8 | 63.69 |
 | PIR-SBFR Full | 3.942 | 8.82 | 3.313 | 301.8 | 65.52 |
@@ -511,7 +511,7 @@ The timing includes only the network forward and excludes disk access, image dec
 
 ## 9. Minimum acceptance checklist
 
-- [ ] Split image counts match paper Table 1.
+- [ ] Split image counts match paper Table 2.
 - [ ] All three seeds are trained from scratch, with configuration and environment saved.
 - [ ] Clean/degraded views share geometric and color augmentation, and degradation RNG is reproducible.
 - [ ] Metadata dropout operates independently per field rather than dropping the whole descriptor.
@@ -523,4 +523,4 @@ The timing includes only the network forward and excludes disk access, image dec
 - [ ] Three-seed results report sample SD.
 - [ ] Bootstrap is paired by image ID and reruns COCOeval.
 - [ ] Parameter/GFLOP reports identify the profiler; latency follows the forward-only protocol exactly.
-- [ ] Unpublished boundaries for flight, mixed-control, and joint OOD experiments are clearly disclosed.
+- [ ] Non-redistributed boundaries for flight, mixed-control, and joint OOD experiments are clearly disclosed.

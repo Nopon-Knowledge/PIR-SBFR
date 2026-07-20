@@ -13,7 +13,7 @@
   <rect width="1600" height="900" rx="28" fill="url(#paperBg)"/>
   <circle cx="1450" cy="80" r="230" fill="#7957ff" opacity="0.08"/>
   <text x="70" y="72" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" font-weight="700">Paper-reported results</text>
-  <text x="70" y="111" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Three-seed means from paper Tables 5, 6, and 15. Higher AP is better.</text>
+  <text x="70" y="111" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Accuracy: Tables 6 and 7. Resources: Table 17. Higher AP is better.</text>
 
   <g filter="url(#paperShadow)">
     <rect x="55" y="145" width="780" height="675" rx="24" fill="#101f37" stroke="#294563" stroke-width="2"/>
@@ -59,9 +59,9 @@
   </g>
   <g fill="#b7c8df" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" text-anchor="middle">
     <text x="225" y="753">DIOR</text><text x="225" y="775">AP</text>
-    <text x="405" y="753">DIOR</text><text x="405" y="775">AP small</text>
+    <text x="405" y="753">DIOR</text><text x="405" y="775">AP_S</text>
     <text x="585" y="753">AI-TOD-v2</text><text x="585" y="775">AP</text>
-    <text x="745" y="753">AI-TOD-v2</text><text x="745" y="775">AP very-tiny</text>
+    <text x="745" y="753">AI-TOD-v2</text><text x="745" y="775">AP_VT</text>
   </g>
 
   <g filter="url(#paperShadow)">
@@ -99,10 +99,11 @@
     <path d="M1275 425 L1378 397" stroke="#6f8daf" stroke-width="2"/>
     <text x="1115" y="432" fill="#c9d8eb" font-size="15">YOLO-DSF</text>
     <path d="M1288 337 L1394 357" stroke="#6f8daf" stroke-width="2"/>
-    <text x="1085" y="337" fill="#c9d8eb" font-size="15">Scale supervision + P5 bypass</text>
+    <text x="1085" y="321" fill="#c9d8eb" font-size="15">DSF + scale supervision</text>
+    <text x="1085" y="340" fill="#c9d8eb" font-size="15">+ P5 bypass</text>
     <path d="M1390 245 L1456 269" stroke="#61cfc1" stroke-width="2"/>
     <text x="1270" y="239" fill="#e6fffb" font-size="16" font-weight="700">PIR-SBFR Full</text>
     <text x="1270" y="266" fill="#62d8c9" font-size="15">65.52 AP at 8.82 GFLOPs</text>
   </g>
-  <text x="70" y="862" fill="#7189ad" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">Values are reported by the paper and are not measurements from the random-initialized repository model.</text>
+  <text x="70" y="862" fill="#7189ad" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">Values are reported by the paper and are not measurements from the randomly initialized repository model.</text>
 </svg>
