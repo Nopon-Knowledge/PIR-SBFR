@@ -1,8 +1,8 @@
 # PIR-SBFR Paper Specification and Implementation Mapping
 
-This document treats the original PIR-SBFR paper as the sole research specification. The paper PDF is not redistributed in this repository. This document records each equation, figure connection, paper-fixed value, current code location, and undisclosed detail; it is not a speculative completion of the authors' private implementation.
+This document maps the July 20, 2026 PIR-SBFR paper revision to the official public implementation. The paper PDF is not redistributed in this repository. The source code and configurations are authoritative for release-level details that the paper summarizes rather than enumerates.
 
-## 1. Reproducibility conclusions
+## 1. Implementation conclusions
 
 The paper defines the following components sufficiently:
 
@@ -14,7 +14,7 @@ The paper defines the following components sufficiently:
 - the abstract FACH formulas for the channel gate, dynamic mixture, identity path, and final task separation;
 - paired degradation, the total loss, fixed hyperparameters, and major experimental protocols.
 
-The paper does not define the following components sufficiently:
+The paper text does not enumerate the following low-level components; the official source code defines them for this release:
 
 - complete YOLO-DSF network YAML, layer indices, width/depth multipliers, and checkpoint;
 - the structure and equations of the original visual-only SBFR;
@@ -27,11 +27,11 @@ The paper does not define the following components sufficiently:
 - flight data;
 - the joint-OOD PSF orientation.
 
-Consequently, this repository is an independent reproduction constrained by the paper's equations and total compute budget, not official code with parameter-by-parameter identity.
+The public implementation therefore combines paper-fixed equations and protocols with source-defined architectural details. Differences between rounded paper resource counts and direct local profiling are documented below.
 
 ## 2. Overall computation graph
 
-The connectivity shown in paper Figures 2 and 4 can be written as:
+The connectivity shown in paper Figures 1 and 3 can be written as:
 
 ```text
 I
@@ -58,10 +58,10 @@ I
 
 The P5 structural bypass does not add P5 before routing or after FACH. It starts from the original P5, passes through a projection that is not multiplied by `w5`, and is added elementwise after FPN-PAN has produced F5. Current code locations:
 
-- backbone：`src/pir_sbfr/models/blocks.py::YOLO11DRFBBackbone`
+- backbone: `src/pir_sbfr/models/blocks.py::YOLO11DRFBBackbone`
 - PIR router and FPN-PAN: `src/pir_sbfr/models/router.py::PIRSBFRNeck`
-- FACH：`src/pir_sbfr/models/blocks.py::FACH`
-- YOLO Detect：`src/pir_sbfr/models/detector.py::PIRSBFRModel`
+- FACH: `src/pir_sbfr/models/blocks.py::FACH`
+- YOLO Detect: `src/pir_sbfr/models/detector.py::PIRSBFRModel`
 
 ## 3. Equations 1-24 mapping
 
@@ -82,7 +82,7 @@ The P5 structural bypass does not add P5 before routing or after FACH. It starts
 | (15) | `D_KL(q || q_hat)` | `scale_kl_divergence` | Batch mean; averaging clean/degraded views is an implementation choice |
 | (16) | Visual + physical logit fusion | `PIRSBFRNeck.forward` | Code uses `log(clamp_min(rho,eps))`; paper writes `log(rho+eps)` |
 | (17) | `P_i_rw=3*w_i*Pbar_i` | `PIRSBFRNeck.forward` | Matches |
-| (18) | Original FPN-PAN | `FPNPAN` | Manually expanded YOLO11-style topology, not the authors' undisclosed YAML |
+| (18) | Original FPN-PAN | `FPNPAN` | The paper does not enumerate a complete YAML; this official release defines the topology directly in Python |
 | (19) | `F5 <- F5+A5(P5)` | `p5_projection` | Independent projection; does not share weights with alignment A5 |
 | (20) | Symmetric KL + normalized-box L1 | `PIRSBFRLoss.consistency_loss` | Clean TaskAligned foreground defines shared R; class softmax; SKL includes 0.5 |
 | (21) | Paired detection + scale + consistency | `PIRSBFRLoss.__call__` | Equation weights match; multiplied by batch size for the Ultralytics loss-return convention |
@@ -120,7 +120,7 @@ X_{ctx}^{(l)}=Conv_{cat}([D_2^{(l)},D_3^{(l)}])
 X^{(l)}=X^{(l-1)}+\phi_{1\times1}^{C/2\rightarrow C}(X_{ctx}^{(l)})
 \]
 
-### 4.1 Structure visible in Figure 3
+### 4.1 Structure visible in Figure 2
 
 ```text
 HxWxC
@@ -188,7 +188,7 @@ Paper equation (7):
 
 - `g`: GSD or relative GSD;
 - `q`: Nyquist MTF or PSF-derived sharpness;
-- `s`：SNR dB；
+- `s`: SNR dB;
 - `a`: field-level availability mask.
 
 Fixed reference:
@@ -354,7 +354,7 @@ Equations (18)-(19):
 F_5\leftarrow F_5+A_5(P_5)
 \]
 
-Figure 4 labels both channel alignment and bypass projection as `A5`, while the text calls it a "separate P5 projection." The code uses an independent `Conv(256,256,1)` that does not share weights with alignment `Conv(256,64,1)`; their output dimensions also differ.
+Figure 3 labels both channel alignment and bypass projection as `A5`, while the text calls it a "separate P5 projection." The code uses an independent `Conv(256,256,1)` that does not share weights with alignment `Conv(256,64,1)`; their output dimensions also differ.
 
 ## 9. Missing metadata and paired consistency
 
@@ -380,7 +380,7 @@ Current choices:
 
 - Run TaskAlignedAssigner on the clean view and use its foreground-anchor set as shared `R` for both views.
 - Apply softmax to foreground class logits.
-- `D_SKL=0.5*(KL(p||p')+KL(p'||p))`；
+- `D_SKL=0.5*(KL(p||p')+KL(p'||p))`;
 - Normalize decoded boxes by image width/height and compute four-coordinate L1.
 - Return a differentiable zero when no foreground exists.
 
@@ -423,7 +423,7 @@ y_i^{cls}=H_{cls}(G_i),\quad
 y_i^{reg}=H_{reg}(G_i)
 \]
 
-### 10.1 Structure visible in Figure 5
+### 10.1 Structure visible in Figure 4
 
 ```text
 neck feature
@@ -440,7 +440,7 @@ neck feature
 
 - The three levels use channel widths `(64,128,256)`.
 - Each level uses an independent channel gate and expert gate.
-- `K_h=3`。
+- `K_h=3`.
 - Each `J_j` is `3x3 depthwise Conv+BN+SiLU` followed by `1x1 Conv+BN+SiLU`.
 - Identity is added to the weighted expert mixture before coupled convolution.
 - Coupled kernels are `(1,1,3)` for P3/P4/P5 respectively.
@@ -489,9 +489,9 @@ a10_full.yaml
 
 The metadata-encoder details required by A7 direct concatenation and A8 FiLM are not disclosed. This repository does not generate configurations that appear precise but are actually arbitrary.
 
-The current configurations use the following interpretation. A0 disables paired degradation, the physical route, the bypass, and both auxiliary losses. A1 enables only paired degradation. A2 disables paired degradation but enables the visual route, scale loss, and bypass; its clean-only loss branch still computes scale KL while physical routing and consistency remain disabled. A3-A6 disable the visual route and both auxiliary losses, retain only the specified analytic prior and bypass, and inherit `degradation.enabled=true`, so detection loss still averages clean/degraded pairs. A9 and A10 both use dual routes and differ only in `lambda_consistency=0/0.1`. When the bypass is disabled, the constructor does not register the 66,048 dead parameters of `p5_projection`. This is a self-consistent independent ablation interpretation, not a reconstruction of undisclosed paper configurations.
+The public configurations use the following runnable mapping. A0 disables paired degradation, the physical route, the bypass, and both auxiliary losses. A1 enables only paired degradation. A2 disables paired degradation but enables the visual route, scale loss, and bypass; its clean-only loss branch still computes scale KL while physical routing and consistency remain disabled. A3-A6 disable the visual route and both auxiliary losses, retain only the specified analytic prior and bypass, and inherit `degradation.enabled=true`, so detection loss still averages clean/degraded pairs. A9 and A10 both use dual routes and differ only in `lambda_consistency=0/0.1`. When the bypass is disabled, the constructor does not register the 66,048 dead parameters of `p5_projection`.
 
-Paper Table 9 establishes only that A2-A10 all include the P5 bypass. Treat the ablations as a constrained configuration family rather than assuming that each row strictly accumulates on the previous row:
+Paper Table 10 establishes only that A2-A10 all include the P5 bypass. Treat the ablations as a constrained configuration family rather than assuming that each row strictly accumulates on the previous row:
 
 | ID | Paper name | Determinable switches | Remaining ambiguity |
 |---|---|---|---|
@@ -510,13 +510,13 @@ Paper Table 9 establishes only that A2-A10 all include the P5 bypass. Treat the 
 
 | Model | Params (M) | GFLOPs | Interpretable increment from previous structure |
 |---|---:|---:|---|
-| YOLO11n | 2.584 | 6.47 | base |
+| YOLOv11n | 2.584 | 6.47 | base |
 | PAN-FPN + DRFB/FACH | 3.462 | 8.08 | Aggregate difference from DRFB/FACH and the controlled neck |
 | YOLO-DSF | 3.628 | 8.43 | Visual-only SBFR aggregation adds approximately `+0.166M/+0.35G` |
 | scale supervision + P5 bypass | 3.691 | 8.51 | `+0.063M/+0.08G` over DSF; scale loss itself has no deployment parameters |
 | PIR-SBFR Full | 3.942 | 8.82 | `+0.314M/+0.39G` over DSF |
 
-Paper Table 7 lists no-consistency as 3.897M/8.76G and Full as 3.942M/8.82G. Section 4.9 explicitly acknowledges that this contradicts the statement that consistency is training-only and removes the no-consistency row from the final efficiency table. In a correct implementation, the two variants must have identical deployment structure, parameter count, and GFLOPs.
+Paper Table 8 lists the no-consistency control as 3.897M/8.76G and Full as 3.942M/8.82G. Section 4.9 states that the stored no-consistency record used incompatible resource counts, so Table 17 omits that deployment row. Because consistency is training-only, the two variants have the same deployed graph in this implementation.
 
 ### 12.2 Current implementation measurements
 
@@ -606,16 +606,16 @@ The realized PSF orientation for the joint condition is not recorded, so exact r
 
 For undisclosed details, `src/pir_sbfr/data/degradations.py` uses the following conventions:
 
-- Apply controlled GSD on a square input already letterboxed to network size. PyTorch bicubic reduction uses `antialias=True`, followed by bicubic restoration to the original network size, matching the paper's sampling order. Results remain `float32 [0,1]` and enter the model without extra quantization. PyTorch's specific cubic-kernel and boundary conventions may still differ from the authors' private implementation.
+- Apply controlled GSD on a square input already letterboxed to network size. PyTorch bicubic reduction uses `antialias=True`, followed by bicubic restoration to the original network size, matching the paper's sampling order. Results remain `float32 [0,1]` and enter the model without extra quantization. PyTorch's specific cubic-kernel and boundary conventions may still differ from the paper's stored experiment realizations.
 - Use reflection borders for Gaussian, disk, motion, and anisotropic filters; the paper does not specify border mode.
 - Normalize a binary disk kernel whose pixel centers lie within the radius.
 - Require the caller to provide motion/anisotropic angles explicitly; the paper does not publish per-image random angles or seed records.
 - Define speckle as `x + x*N(0,sigma)`.
 - Define stripes as a vertical sinusoid with four periods and random phase, followed by Gaussian read noise. The paper does not provide orientation, frequency, phase, or the exact function.
 
-Therefore, apart from the geometry of GSD 1.5/2.5/4, several of the nine OOD conditions can reproduce only the same operator class and cannot claim pixel-level identity with the authors' test set.
+Therefore, apart from the geometry of GSD 1.5/2.5/4, several of the nine OOD conditions reproduce the same operator class but do not claim pixel-level identity with the paper's stored test realization.
 
-## 14. Boundaries of the unpublished flight experiment
+## 14. Boundaries of the non-redistributed flight experiment
 
 The paper's flight collection contains eight complete videos, altitudes from 5.2 to 30.0 m, 5,370 annotated frames, and 38,947 instances. It is not a public benchmark, and the paper's Data Availability statement provides no download location.
 
@@ -625,7 +625,7 @@ Relative GSD is obtained from attitude-corrected slant range:
 g=\frac{H/\cos\theta}{H_{ref}/\cos\theta_{ref}}
 \]
 
-MTF/PSF and SNR are not recorded, so their masks must be zero and must not be inferred from labels or imagery. Without videos, frame-level annotations, synchronized telemetry, reference altitude/angle, and complete split files, this repository cannot reproduce Tables 12/13. It can only preserve the same API and missing-field logic.
+MTF/PSF and SNR are not recorded, so their masks must be zero and must not be inferred from labels or imagery. Without videos, frame-level annotations, synchronized telemetry, reference altitude/angle, and complete split files, this repository cannot reproduce Tables 14/15. It can only preserve the same API and missing-field logic.
 
 ## 15. External implementations and references
 
@@ -633,15 +633,15 @@ Base code repository directly cited by the paper:
 
 - Jocher, G.; Qiu, J. *Ultralytics YOLO11, Version 11.0.0* (2024): `https://github.com/ultralytics/ultralytics`
 
-The same repository is also used for the paper's YOLOv8 citation. The paper provides no PIR-SBFR or YOLO-DSF source repository.
+The same repository is also used for the paper's YOLOv8 citation. This repository is the official PIR-SBFR release; a separate YOLO-DSF checkpoint and source package are not bundled.
 
 Related method references:
 
 - *Multi-Scale Context Aggregation by Dilated Convolutions*: dilation background for DRFB; the paper provides no DOI or code URL.
 - *Deep Residual Learning for Image Recognition*: identity/residual background for DRFB; the paper provides no DOI or code URL.
 - *Dynamic Convolution: Attention over Convolution Kernels*, *Dynamic Head*, and *TOOD*: dynamic-coupling background for FACH; the paper provides no code URL.
-- GSDDet：DOI `10.1109/TGRS.2023.3309838`。
-- FiLM：DOI `10.1609/aaai.v32i1.11671`。
-- AI-TOD-v2：DOI `10.1016/j.isprsjprs.2022.06.002`。
+- GSDDet: DOI `10.1109/TGRS.2023.3309838`.
+- FiLM: DOI `10.1609/aaai.v32i1.11671`.
+- AI-TOD-v2: DOI `10.1016/j.isprsjprs.2022.06.002`.
 
-The PDF contains no embedded source, configuration, or checkpoint. The text mentions an internal `scripts/bootstrap_paired_coco.py`, but that file is absent from the paper attachments. This repository's script with the same name is a new implementation of the documented protocol.
+The PDF contains no embedded source, configuration, or checkpoint. The official `scripts/bootstrap_paired_coco.py` in this repository implements the documented image-paired evaluation protocol.

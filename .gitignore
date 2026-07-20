@@ -12,4 +12,5 @@ __pycache__/
 /weights/
 /tmp/
 /output/
+template.pdf
 .DS_Store

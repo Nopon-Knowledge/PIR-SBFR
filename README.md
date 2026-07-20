@@ -1,6 +1,6 @@
-# PIR-SBFR: Physical Imaging Reliability-Guided Scale-Biased Feature Reweighting
+# From Image Formation to Feature Routing: PIR-SBFR
 
-The official open-source implementation of **PIR-SBFR** for robust object detection in degraded optical remote-sensing imagery, released by the paper authors.
+The official open-source implementation of *PIR-SBFR for Observation-Constrained Multiscale Evidence Allocation in Optical Remote Sensing*, released by the paper authors.
 
 ![Python 3.9–3.12](https://img.shields.io/badge/Python-3.9--3.12-3776AB?logo=python&logoColor=white)
 ![PyTorch 2.8.0](https://img.shields.io/badge/PyTorch-2.8.0-EE4C2C?logo=pytorch&logoColor=white)
@@ -68,19 +68,50 @@ This close agreement verifies that the released implementation matches the model
 ## Paper-reported results
 
 > [!NOTE]
-> These charts are original redraws of values reported in Tables 5, 6, 11, and 15 and Figure 7 of the paper. They summarize the published results; they are not measurements from the randomly initialized model in this repository. Reproducing these accuracy values requires the complete datasets and the documented three-seed training protocol.
+> These charts are original redraws of the current paper's Figure 5 and Tables 6, 7, 13, and 17; the observation-grid summary comes from Figure 8. All accuracy values are percentages and all deltas are percentage points. AP entries with uncertainty are three-seed means ± sample SD. These are published results, not measurements from the randomly initialized repository model.
 
 ![Paper-reported accuracy and efficiency results](docs/assets/paper-results-overview.svg)
 
-On the paper's YOLO-DSF baseline, the full PIR-SBFR model reports:
+### Benchmark accuracy
 
-- **DIOR:** AP rises from 62.98 to 65.52 (+2.54 points), while small-object AP rises from 44.08 to 47.61 (+3.53 points).
-- **AI-TOD-v2:** AP rises from 29.61 to 32.13 (+2.52 points), while very-tiny-object AP rises from 14.62 to 17.22 (+2.60 points).
-- **Compute:** the reported cost rises from 8.43 to 8.82 GFLOPs (+4.63%) at `640 × 640` resolution.
+| Dataset and metric | YOLOv11n | YOLO-DSF | PIR-SBFR Full | Delta vs. YOLO-DSF | Source |
+| --- | ---: | ---: | ---: | ---: | --- |
+| DIOR AP | 57.31 ± 0.47 | 62.98 ± 0.43 | **65.52 ± 0.42** | **+2.54** | Table 6 |
+| DIOR `AP_S` | 38.64 | 44.08 | **47.61** | **+3.53** | Table 6 |
+| AI-TOD-v2 AP | 25.82 ± 0.37 | 29.61 ± 0.37 | **32.13 ± 0.36** | **+2.52** | Table 7 |
+| AI-TOD-v2 `AP_VT` | 10.84 | 14.62 | **17.22** | **+2.60** | Table 7 |
+
+### Deployment efficiency
+
+The paper measures forward-only FP16 inference with batch size 1 at `640 × 640` on an RTX 4090. Preprocessing, data transfer, NMS, and serialization are excluded.
+
+| Model | Params (M) | GFLOPs | Peak VRAM (GB) | FP16 size (MB) | Latency (ms) | FPS | DIOR AP |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| YOLOv11n | 2.584 | 6.47 | 0.721 | 5.17 | 2.347 | 426.1 | 57.31 |
+| YOLO-DSF | 3.628 | 8.43 | 0.858 | 7.28 | 3.079 | 324.8 | 62.98 |
+| DSF + scale supervision + P5 bypass | 3.691 | 8.51 | 0.872 | 7.41 | 3.117 | 320.8 | 63.69 |
+| **PIR-SBFR Full** | 3.942 | 8.82 | 0.903 | 7.90 | 3.313 | 301.8 | **65.52** |
+
+Relative to YOLO-DSF, PIR-SBFR Full adds 0.314 M parameters (+8.65%) and 0.39 GFLOPs (+4.63%). These values are reported in Table 17.
 
 ![Paper-reported robustness results](docs/assets/paper-robustness-results.svg)
 
-The robustness study reports positive PIR-SBFR gains in all 27 in-distribution degradation cells and all nine held-out degradation conditions. Across the held-out conditions, mean AP rises from 46.95 to 51.32; under the most difficult joint shift, AP rises from 29.60 to 36.97.
+### Held-out degradation robustness
+
+| Held-out condition | YOLO-DSF AP | PIR-SBFR AP | Delta AP |
+| --- | ---: | ---: | ---: |
+| Defocus PSF | 51.58 | 55.21 | **+3.63** |
+| Motion PSF | 49.65 | 53.17 | **+3.52** |
+| Anisotropic PSF | 50.14 | 54.09 | **+3.95** |
+| Speckle noise | 52.38 | 55.52 | **+3.14** |
+| Stripe + read noise | 51.84 | 54.80 | **+2.96** |
+| Unseen GSD 1.5× | 56.71 | 59.53 | **+2.82** |
+| Unseen GSD 2.5× | 46.70 | 51.86 | **+5.16** |
+| Unseen GSD 4× | 33.95 | 40.74 | **+6.79** |
+| Joint degradation | 29.60 | 36.97 | **+7.37** |
+| **Mean / worst** | **46.95 / 29.60** | **51.32 / 36.97** | **+4.37 / +7.37** |
+
+Table 13 reports positive gains for all nine held-out conditions. Figure 8 reports positive gains in all 27 cells of the controlled GSD-MTF-SNR grid, spanning +2.54 to +10.23 points with a mean gain of +7.66 points.
 
 ## Method overview
 
@@ -360,7 +391,7 @@ pir-train \
   --device 0
 ```
 
-### Train the YOLO11n baseline
+### Train the YOLOv11n baseline
 
 ```bash
 python scripts/train_yolo11n_baseline.py \
@@ -630,6 +661,6 @@ The package metadata in [`pyproject.toml`](pyproject.toml) declares the official
 
 If this repository supports your research:
 
-1. cite Zizheng Zhao, Jingchao Liu, Zixin Wang, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *PIR-SBFR: Physical Imaging Reliability-Guided Scale-Biased Feature Reweighting for Robust Object Detection in Optical Remote Sensing Imagery*;
+1. cite Zizheng Zhao, Jingchao Liu, Zixin Wang, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *From Image Formation to Feature Routing: PIR-SBFR for Observation-Constrained Multiscale Evidence Allocation in Optical Remote Sensing*;
 2. identify this repository as the official open-source implementation;
 3. include the exact Git commit, configuration, dataset split, and training seeds used.

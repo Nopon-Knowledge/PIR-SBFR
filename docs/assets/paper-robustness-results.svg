@@ -17,7 +17,7 @@
   <rect width="1600" height="900" rx="28" fill="url(#robustBg)"/>
   <circle cx="1450" cy="120" r="240" fill="#1cae9f" opacity="0.08"/>
   <text x="70" y="72" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" font-weight="700">Robustness beyond the training distribution</text>
-  <text x="70" y="111" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Paper Table 11: AP gain of PIR-SBFR Full over YOLO-DSF, in percentage points.</text>
+  <text x="70" y="111" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Paper Table 13: AP gain of PIR-SBFR Full over YOLO-DSF, in percentage points.</text>
 
   <g filter="url(#robustShadow)">
     <rect x="65" y="145" width="240" height="72" rx="18" fill="#132946" stroke="#31587d" stroke-width="2"/>
@@ -25,7 +25,7 @@
     <rect x="585" y="145" width="300" height="72" rx="18" fill="#123a40" stroke="#2b8f86" stroke-width="2"/>
   </g>
   <g font-family="Inter,Segoe UI,Arial,sans-serif" text-anchor="middle">
-    <text x="185" y="174" fill="#8fa7c8" font-size="14">Factorial grid</text><text x="185" y="201" fill="#ffffff" font-size="22" font-weight="700">27 / 27 cells improve</text>
+    <text x="185" y="174" fill="#8fa7c8" font-size="14">GSD-MTF-SNR grid</text><text x="185" y="201" fill="#ffffff" font-size="22" font-weight="700">27 / 27 cells improve</text>
     <text x="445" y="174" fill="#8fa7c8" font-size="14">Grid mean gain</text><text x="445" y="201" fill="#ffffff" font-size="22" font-weight="700">+7.66 pp</text>
     <text x="735" y="174" fill="#82c7c0" font-size="14">Held-out operators</text><text x="735" y="201" fill="#e7fffb" font-size="22" font-weight="700">9 / 9 conditions improve</text>
   </g>
@@ -79,6 +79,6 @@
   </g>
   <g font-family="Inter,Segoe UI,Arial,sans-serif">
     <text x="70" y="850" fill="#7189ad" font-size="15">Mean unseen AP: 46.95 to 51.32 (+4.37 pp). Joint worst case: 29.60 to 36.97 (+7.37 pp).</text>
-    <text x="1530" y="850" text-anchor="end" fill="#7189ad" font-size="15">Paper-reported values; see Table 11 and Figure 7.</text>
+    <text x="1530" y="850" text-anchor="end" fill="#7189ad" font-size="15">Paper-reported values; see Table 13 and Figure 8.</text>
   </g>
 </svg>

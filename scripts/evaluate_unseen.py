@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evaluate the nine held-out imaging conditions reported in paper Table 11.
+"""Evaluate the nine held-out imaging conditions reported in paper Table 13.
 
 The PDF specifies the pixel operators but does not fully specify how non-MTF
 PSFs and non-Poisson noise were converted to the router's scalar MTF/SNR
