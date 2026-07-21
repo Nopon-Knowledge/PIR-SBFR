@@ -18,7 +18,7 @@ from .router import PIRSBFRNeck
 
 
 class PIRSBFRModel(BaseModel):
-    """Runnable official implementation model.
+    """Runnable open-source implementation model.
 
     The last element of ``self.model`` is the official Ultralytics ``Detect``
     module. This preserves YOLO11 decoding, DFL, TaskAligned assignment and

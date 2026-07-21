@@ -1,6 +1,6 @@
 # From Image Formation to Feature Routing: PIR-SBFR
 
-The official open-source implementation of *PIR-SBFR for Observation-Constrained Multiscale Evidence Allocation in Optical Remote Sensing*, released by the paper authors.
+The open-source implementation of *PIR-SBFR for Observation-Constrained Multiscale Evidence Allocation in Optical Remote Sensing*.
 
 ![Python 3.9–3.12](https://img.shields.io/badge/Python-3.9--3.12-3776AB?logo=python&logoColor=white)
 ![PyTorch 2.8.0](https://img.shields.io/badge/PyTorch-2.8.0-EE4C2C?logo=pytorch&logoColor=white)
@@ -15,7 +15,7 @@ The official open-source implementation of *PIR-SBFR for Observation-Constrained
 This repository implements the model, paired-degradation training procedure, complete loss, DIOR and AI-TOD-v2 data conversion, paper-specific COCO evaluation, robustness experiments, metadata controls, statistical analysis, and deployment-oriented efficiency benchmarks described in the original PIR-SBFR paper. The paper PDF is not redistributed in this repository.
 
 > [!IMPORTANT]
-> This is the **official open-source codebase released by the PIR-SBFR paper authors**. It contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices used for the public release. Dataset files, the paper PDF, and private flight data are not redistributed. Pretrained weights and training checkpoints **cannot be publicly released under the institutional regulations governing this work**. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
+> This is the **open-source implementation of PIR-SBFR**. It contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices used for the public release. Dataset files, the paper PDF, and private flight data are not redistributed. Pretrained weights and training checkpoints **cannot be publicly released under the institutional regulations governing this work**. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
 
 ## Table of contents
 
@@ -668,7 +668,7 @@ PIR-SBFR/
 
 ## Release scope and reproducibility
 
-This repository is the official public implementation of PIR-SBFR. The released source code and configurations define the model architecture, training objective, metadata handling, dataset conversion, evaluation protocol, ablations, and robustness tools.
+This repository is the open-source implementation of PIR-SBFR. The released source code and configurations define the model architecture, training objective, metadata handling, dataset conversion, evaluation protocol, ablations, and robustness tools.
 
 The repository intentionally does not bundle third-party datasets, private flight imagery and metadata, or the paper PDF. Pretrained weights and training checkpoints cannot be publicly released under the institutional regulations governing this work. A regenerated joint OOD condition marked with `approximate=true` and metadata controls marked with `surrogate_input=true` must be distinguished from the non-redistributed archived evaluation inputs.
 
@@ -719,10 +719,10 @@ At minimum: commit ID, dataset split and conversion report, GPU/CUDA information
 
 ## License and citation
 
-The official implementation code is released under the [MIT License](LICENSE). The paper, DIOR, AI-TOD-v2, Ultralytics, and all other third-party dependencies remain governed by their original licenses and terms.
+The open-source implementation code is released under the [MIT License](LICENSE). The paper, DIOR, AI-TOD-v2, Ultralytics, and all other third-party dependencies remain governed by their original licenses and terms.
 
 If this repository supports your research:
 
 1. cite Zizheng Zhao, Jingchao Liu, Zixin Wang, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *From Image Formation to Feature Routing: PIR-SBFR for Observation-Constrained Multiscale Evidence Allocation in Optical Remote Sensing*;
-2. identify this repository as the official open-source implementation;
+2. identify this repository as the open-source implementation;
 3. include the exact Git commit, configuration, dataset split, and training seeds used.

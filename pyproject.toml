@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pir-sbfr"
 version = "0.1.0"
-description = "Official implementation of PIR-SBFR for observation-constrained multiscale evidence allocation"
+description = "Open-source implementation of PIR-SBFR for observation-constrained multiscale evidence allocation"
 readme = "README.md"
 requires-python = ">=3.9,<3.13"
 license = {text = "MIT"}

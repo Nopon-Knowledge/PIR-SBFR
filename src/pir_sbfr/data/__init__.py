@@ -1,4 +1,4 @@
-"""Dataset preparation utilities for the official PIR-SBFR implementation."""
+"""Dataset preparation utilities for the open-source PIR-SBFR implementation."""
 
 from .aitodv2 import prepare_aitodv2
 from .degradations import (

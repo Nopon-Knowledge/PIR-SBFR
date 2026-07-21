@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Shared, script-local helpers for reconstructed COCO stress tests.
+"""Shared, script-local helpers for generated COCO stress tests.
 
 The paper applies synthetic image formation after the source image has been
 letterboxed to the network input size.  The public inference helper normally

@@ -164,7 +164,7 @@ def _anisotropic_kernel(sigma_x: float, sigma_y: float, angle_degrees: float) ->
 
 
 def _equivalent_nyquist_mtf(kernel: np.ndarray) -> float:
-    """Average axial discrete Nyquist response used as reconstructed scalar q."""
+    """Average axial discrete Nyquist response used as the derived scalar q."""
 
     rows = (-1.0) ** np.arange(kernel.shape[0], dtype=np.float32)
     columns = (-1.0) ** np.arange(kernel.shape[1], dtype=np.float32)
