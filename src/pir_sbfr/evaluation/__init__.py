@@ -1,4 +1,4 @@
-"""Evaluation utilities for the official PIR-SBFR implementation."""
+"""Evaluation utilities for the open-source PIR-SBFR implementation."""
 
 from .bootstrap import BootstrapResult, RemappedCocoSample, paired_bootstrap_coco, remap_paired_coco_sample
 from .coco import (

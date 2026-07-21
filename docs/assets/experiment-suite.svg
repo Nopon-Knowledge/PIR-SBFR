@@ -73,6 +73,6 @@
 
   <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" fill="#7189ad">
     <text x="78" y="690">Every generated result records conditions, seeds, and approximation flags.</text>
-    <text x="1520" y="690" text-anchor="end">Designed for auditable reproduction, not hidden defaults.</text>
+    <text x="1520" y="690" text-anchor="end">Designed for auditable experiments, not hidden defaults.</text>
   </g>
 </svg>

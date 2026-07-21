@@ -1,4 +1,4 @@
-# Runtime dependencies for the official PIR-SBFR implementation.
+# Runtime dependencies for the open-source PIR-SBFR implementation.
 # Keep this file synchronized with [project].dependencies in pyproject.toml.
 numpy>=1.24,<2.0
 opencv-python>=4.8,<5
