@@ -719,7 +719,7 @@ At minimum: commit ID, dataset split and conversion report, GPU/CUDA information
 
 ## License and citation
 
-The package metadata in [`pyproject.toml`](pyproject.toml) declares the official implementation code as MIT licensed. The paper, DIOR, AI-TOD-v2, Ultralytics, and all other third-party dependencies remain governed by their original licenses and terms.
+The official implementation code is released under the [MIT License](LICENSE). The paper, DIOR, AI-TOD-v2, Ultralytics, and all other third-party dependencies remain governed by their original licenses and terms.
 
 If this repository supports your research:
 
