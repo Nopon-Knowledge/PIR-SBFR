@@ -1,10 +1,10 @@
 # PIR-SBFR Open-Source Implementation Specification
 
-This document maps the July 20, 2026 PIR-SBFR paper revision to the open-source implementation. The paper PDF is not redistributed in this repository. The source code and configurations define release-level details that the paper summarizes rather than enumerates.
+This document maps the current Sensors manuscript, *PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing*, to the open-source implementation. The manuscript PDF is not redistributed in this repository. The source code and configurations define release-level details that the manuscript summarizes rather than enumerates.
 
 ## 1. Implementation conclusions
 
-The paper defines the following components sufficiently:
+The manuscript defines the following components sufficiently:
 
 - P3/P4/P5 strides;
 - DRFB channel compression, two dilation branches, and residual form;
@@ -14,7 +14,7 @@ The paper defines the following components sufficiently:
 - the abstract FACH formulas for the channel gate, dynamic mixture, identity path, and final task separation;
 - paired degradation, the total loss, fixed hyperparameters, and major experimental protocols.
 
-For release-level components that the paper summarizes at method level, the open-source implementation provides the complete executable definitions:
+For release-level components that the manuscript summarizes at method level, the open-source implementation provides the complete executable definitions:
 
 - complete executable internal visual-only baseline topology, layer indices, and width/depth settings;
 - the public visual-only SBFR baseline configuration;
@@ -26,16 +26,16 @@ For release-level components that the paper summarizes at method level, the open
 
 The following experiment artifacts are not redistributed in the public repository and are treated as data-availability or release-policy boundaries rather than implementation gaps:
 
-- pretrained weights and training checkpoints, which cannot be publicly released under the institutional regulations governing this work;
+- pretrained weights and training checkpoints, including public-benchmark-only checkpoints, which cannot be publicly released under the institutional model-artifact release policy governing this work;
 - sample-level degradation records for the mixed-degradation control;
 - private flight videos, annotations, and telemetry;
 - the joint-OOD PSF orientation.
 
-The open-source implementation is the executable form of the paper method provided by this repository. The paper supplies the method-level presentation and reported results; the source code supplies the release-level architectural and numerical definitions. Differences between rounded paper resource counts and direct local profiling are documented below.
+The checkpoint restriction above is independent of the data-providing institution's restriction on private flight artifacts. The open-source implementation is the executable form of the manuscript method provided by this repository. The manuscript supplies the method-level presentation and reported results; the source code supplies the release-level architectural and numerical definitions. Differences between rounded manuscript resource counts and direct local profiling are documented below.
 
 ## 2. Overall computation graph
 
-The connectivity shown in paper Figures 1 and 3 can be written as:
+The connectivity shown in manuscript Figures 1 and 3 can be written as:
 
 ```text
 I
@@ -67,9 +67,9 @@ The P5 structural bypass does not add P5 before routing or after FACH. It starts
 - FACH: `src/pir_sbfr/models/blocks.py::FACH`
 - YOLO Detect: `src/pir_sbfr/models/detector.py::PIRSBFRModel`
 
-## 3. Equations 1-26 mapping
+## 3. Manuscript Equations 1-26 mapping
 
-| Paper equation | Meaning | Open-source implementation | Agreement and source definitions |
+| Manuscript equation | Meaning | Open-source implementation | Agreement and source definitions |
 |---|---|---|---|
 | (1)-(2) | `I -> B_DRFB -> {P_i} -> N_PIR -> {F_i} -> H_FACH` | `PIRSBFRModel._forward_detector` | Connection order matches; final decoding reuses Ultralytics `Detect` |
 | (3) | `1x1 C->C/2` channel compression | `DRFB.reduce` | Conv+BN+SiLU |
@@ -85,7 +85,7 @@ The P5 structural bypass does not add P5 before routing or after FACH. It starts
 | (14) | `q_hat=softmax(delta_vis)` | `VisualResidualRouter.forward` | Matches |
 | (15) | Labeled scale distribution | `object_scale_distribution` | `epsilon=1e-6`; computed from boxes after augmentation |
 | (16) | `D_KL(q || q_hat)` | `scale_kl_divergence` | Batch mean; the implementation averages clean and degraded views |
-| (17) | Visual + physical logit fusion | `PIRSBFRNeck.forward` | Code uses `log(clamp_min(rho,eps))`; paper writes `log(rho+eps)` |
+| (17) | Visual + analytic-prior logit fusion | `PIRSBFRNeck.forward` | Code uses `log(clamp_min(rho,eps))`; the manuscript writes `log(rho+eps)` |
 | (18) | `P_i_rw=3*w_i*Pbar_i` | `PIRSBFRNeck.forward` | Matches |
 | (19) | Original FPN-PAN | `FPNPAN` | The implementation defines the complete topology directly in Python |
 | (20) | `F5 <- F5+A5(P5)` | `p5_projection` | Independent projection; does not share weights with alignment A5 |
@@ -104,7 +104,7 @@ For input:
 X^{(l-1)}\in\mathbb{R}^{H\times W\times C}
 \]
 
-Paper equation (3):
+Manuscript equation (3):
 
 \[
 X_{red}^{(l)}=\sigma\left(BN\left(Conv_{1\times1}^{C\rightarrow C/2}(X^{(l-1)})\right)\right)
@@ -126,7 +126,7 @@ X_{ctx}^{(l)}=Conv_{cat}([D_2^{(l)},D_3^{(l)}])
 X^{(l)}=X^{(l-1)}+\phi_{1\times1}^{C/2\rightarrow C}(X_{ctx}^{(l)})
 \]
 
-### 4.1 Paper-level structure
+### 4.1 Manuscript-level structure
 
 ```text
 HxWxC
@@ -138,7 +138,7 @@ HxWxC
  -> HxWxC
 ```
 
-The paper presents the module at operator level. The open-source implementation supplies release-level definitions for:
+The manuscript presents the module at operator level. The open-source implementation supplies release-level definitions for:
 
 - the role, kernel, normalization, and activation of `Conv_cat`;
 - standard/grouped convolution behavior in each dilation branch;
@@ -179,20 +179,20 @@ down(F3) + TD4 -> C3k2 -> F4(128)
 down(F4) + aligned P5 -> C3k2 -> F5(256)
 ```
 
-The paper summarizes this stage as "original FPN-PAN operations"; the topology and channel widths above are the source-defined release configuration in this repository.
+The manuscript summarizes this stage as "original FPN-PAN operations"; the topology and channel widths above are the source-defined release configuration in this repository.
 
-## 6. Analytic physical reliability
+## 6. Image-formation-informed analytic reliability
 
 ### 6.1 Inputs and reference
 
-Paper equation (7):
+Manuscript equation (7):
 
 \[
 \mathbf{m}=[g,q,s]^T,\quad \mathbf{a}=[a_g,a_q,a_s]^T\in\{0,1\}^3
 \]
 
 - `g`: GSD or relative GSD;
-- `q`: Nyquist MTF or PSF-derived sharpness;
+- `q`: MTF/PSF-derived sharpness descriptor, not a complete laboratory-calibrated camera MTF curve;
 - `s`: SNR dB;
 - `a`: field-level availability mask.
 
@@ -202,13 +202,15 @@ Fixed reference:
 g_{ref}=1,\quad q_{ref}=0.50,\quad s_{ref}=30
 \]
 
-For the private flight collection, paper equation (8) defines attitude-corrected relative GSD:
+For the private flight collection, manuscript equation (8) defines attitude-corrected relative GSD:
 
 \[
 g=\frac{H/\cos\theta}{H_{ref}/\cos\theta_{ref}}
 \]
 
-Here `H` is recorded height and `theta` is the off-nadir angle obtained from synchronized attitude and IMU fields. This preprocessing belongs to the restricted flight-data workflow; public benchmark runs receive controlled relative GSD directly.
+Here `H` is recorded height and `theta` is the off-nadir angle obtained from synchronized attitude and IMU fields. This preprocessing belongs to the restricted flight-data workflow. DIOR and AI-TOD-v2 do not provide native telemetry; their benchmark stress tests receive controlled proxy descriptors generated by the evaluation protocol. UAV MTF/PSF and SNR are unavailable and use zero availability masks.
+
+The prior is a calibration-free monotonic analytic mapping informed by image formation. Here, “physical” in retained code identifiers refers to the origin and monotonic organization of the acquisition constraints, not to a calibrated end-to-end sensor-response model.
 
 ### 6.2 Degradation coordinates
 
@@ -226,7 +228,7 @@ d_q=\max(0,1-q/q_{ref})
 d_s=\max(0,(s_{ref}-s)/s_{ref})
 \]
 
-The code first replaces fields whose mask is zero with reference values, then performs logarithms and division, and finally multiplies by the mask. This matches the paper for valid fields and avoids `log(0)` when a missing GSD uses a zero placeholder.
+The code first replaces fields whose mask is zero with reference values, then performs logarithms and division, and finally multiplies by the mask. This matches the manuscript for valid fields and avoids `log(0)` when a missing GSD uses a zero placeholder.
 
 ### 6.3 level-wise prior
 
@@ -347,7 +349,7 @@ physical_logits = eta * log(rho_phy.clamp_min(eps))
 weights = softmax((delta_vis + physical_logits) / temperature)
 ```
 
-`clamp_min(eps)` is the source-level stabilization used for the paper's `rho+eps` expression and prevents extreme exponential underflow.
+`clamp_min(eps)` is the source-level stabilization used for the manuscript's `rho+eps` expression and prevents extreme exponential underflow.
 
 Equation (18):
 
@@ -371,7 +373,7 @@ Figure 3 labels both channel alignment and bypass projection as `A5`, while the 
 
 ## 9. Missing metadata and paired consistency
 
-During training, each acquisition field and its mask are independently dropped with `p_drop=0.25`. This random process belongs to the dataloader/trainer, not `PhysicalReliabilityPrior`. The model is responsible for safe mask consumption and a neutral fallback.
+During training, each acquisition field and its mask are independently dropped with `p_drop=0.25`. This random process belongs to the dataloader/trainer, not `PhysicalReliabilityPrior`. The model is responsible for safe mask consumption and a neutral fallback. The class name and configuration keys containing `physical` are retained as stable source interfaces; the public method terminology is image-formation-informed analytic reliability.
 
 The included `PairedDegradationGenerator` samples one field-level mask for a clean/degraded pair and shares it across both views. Consistency loss therefore does not also mix metadata-missingness differences.
 
@@ -382,7 +384,7 @@ L_{cons}=\frac{1}{|R|}\sum_{r\in R}
 [D_{SKL}(p_r,p'_r)+\|b_r-b'_r\|_1]
 \]
 
-The paper gives the consistency objective at method level. The open-source implementation defines the following execution details:
+The manuscript gives the consistency objective at method level. The open-source implementation defines the following execution details:
 
 - construction of shared set `R` under TaskAligned assignment;
 - conversion of YOLO class scores into the distribution used by KL;
@@ -484,7 +486,7 @@ PIRSBFRModel(
 )
 ```
 
-This internal control is the supported starting point for public ablation runs. It is not presented as a separate published detector.
+This internal control is the supported starting point for public ablation runs. It is not presented as a separately published detector.
 
 The repository records these choices in `configs/ablations/`:
 
@@ -492,34 +494,35 @@ The repository records these choices in `configs/ablations/`:
 a0_visual_only.yaml
 a1_degradation_augmentation.yaml
 a2_scale_p5.yaml
-a3_gsd.yaml
-a4_mtf.yaml
-a5_snr.yaml
-a6_analytic_all.yaml
-a9_no_consistency.yaml
-a10_full.yaml
+a3_mtf_psf.yaml
+a4_snr.yaml
+a5_analytic_combined.yaml
+a8_analytic_visual.yaml
+a9_full.yaml
 factorial/b0_shared_baseline.yaml
 factorial/bs_scale_only.yaml
 factorial/bp_p5_only.yaml
 factorial/bsp_joint.yaml
 ```
 
-A7 direct concatenation and A8 FiLM are reported comparison controls but are not exposed as standalone YAML configurations in this public release. Their paper-reported values remain part of the experimental record; the executable configuration set focuses on A0-A6, A9, and A10.
+A6 metadata concatenation and A7 Metadata-FiLM are manuscript-reported comparison controls; no standalone configuration is currently distributed for either. Their manuscript-reported values remain part of the experimental record. A single-field GSD analytic configuration is intentionally not distributed because relative GSD is fixed at its reference value during paired training.
 
-The public configurations use the following source-defined mapping. A0 disables paired degradation, the physical route, the bypass, and both auxiliary losses. A1 adds paired degradation. A2 retains paired degradation and enables the visual scale loss plus the bypass. A3-A6 disable the visual route and both auxiliary losses, retain only the specified analytic prior and bypass, and inherit `degradation.enabled=true`, so detection loss averages clean/degraded pairs. A9 and A10 both use dual routes and differ only in `lambda_consistency=0/0.1`. When the bypass is disabled, the constructor does not register the 66,048 inactive parameters of `p5_projection`.
+The public configurations use the following source-defined mapping. A0 disables paired degradation, the analytic route, the bypass, and both auxiliary losses. A1 adds paired blur/noise degradation. A2 retains paired degradation and enables the visual scale loss plus the bypass. A3-A5 disable the visual route and both auxiliary losses, retain only the specified analytic prior and bypass, and inherit `degradation.enabled=true`, so detection loss averages clean/degraded pairs. A8 and A9 both use dual routes and differ only in `lambda_consistency=0/0.1`. When the bypass is disabled, the constructor does not register the 66,048 inactive parameters of `p5_projection`.
 
-Paper Table 10 and the public YAML files together define the ablation family; rows are controlled configurations rather than a strictly cumulative sequence:
+Manuscript Table 11 and the public YAML files together define the ablation family; rows are controlled configurations rather than a strictly cumulative sequence:
 
 | ID | Paper name | Public setting | Release note |
 |---|---|---|---|
-| A0 | Internal visual-only baseline | visual-only, no PIR, no bypass | Public baseline: `a0_visual_only.yaml` |
+| A0 | Baseline | visual-only, no analytic prior, no bypass | Public baseline: `a0_visual_only.yaml` |
 | A1 | + degradation augmentation | A0 structure plus paired degradation | Public configuration: `a1_degradation_augmentation.yaml` |
 | A2 | + scale supervision + P5 bypass | visual scale loss + bypass | Public configuration: `a2_scale_p5.yaml` |
-| A3-A5 | single physical reliability | matching one-hot `physical_fields`, with bypass | Public GSD/MTF/SNR configurations |
-| A6 | analytic GSD+MTF+SNR prior | three-field physical prior, with bypass | Public configuration: `a6_analytic_all.yaml` |
-| A7-A8 | concat / FiLM controls | paper-reported metadata-conditioning controls | No standalone YAML in this release |
-| A9 | analytic prior + visual residual | dual PIR routes, with bypass | Public configuration: `a9_no_consistency.yaml` |
-| A10 | Full | A9 + consistency | Public configuration: `a10_full.yaml` |
+| A3 | MTF/PSF-only analytic prior | MTF/PSF-sharpness field with bypass | Public configuration: `a3_mtf_psf.yaml` |
+| A4 | SNR-only analytic prior | SNR field with bypass | Public configuration: `a4_snr.yaml` |
+| A5 | Combined analytic route, with GSD at reference | three-field interface with training GSD fixed at `1` | Public configuration: `a5_analytic_combined.yaml` |
+| A6 | Metadata concatenation | manuscript-reported metadata-conditioning control | No standalone configuration is currently distributed |
+| A7 | Metadata-FiLM | manuscript-reported metadata-conditioning control | No standalone configuration is currently distributed |
+| A8 | Analytic prior + visual residual | dual PIR routes, with bypass | Public configuration: `a8_analytic_visual.yaml` |
+| A9 | Full PIR-SBFR with consistency regularization | A8 + consistency | Public configuration: `a9_full.yaml` |
 
 Paper equation (26) defines the paired factorial interaction:
 
@@ -527,7 +530,7 @@ Paper equation (26) defines the paired factorial interaction:
 \Delta_{int}=Y_{11}-Y_{10}-Y_{01}+Y_{00}
 \]
 
-The four Table 11 cells inherit A1's degradation-augmented training protocol and vary only scale supervision and the P5 bypass:
+The four Table 12 cells inherit A1's degradation-augmented training protocol and vary only scale supervision and the P5 bypass:
 
 | Cell | Public configuration | Scale supervision | P5 bypass |
 |---|---|---:|---:|
@@ -548,7 +551,7 @@ The four Table 11 cells inherit A1's degradation-augmented training protocol and
 | Internal scaffold + scale supervision + P5 bypass | 3.691 | 8.51 | `+0.063M/+0.08G` over the internal baseline; scale loss itself has no deployment parameters |
 | PIR-SBFR Full | 3.942 | 8.82 | `+0.314M/+0.39G` over the internal baseline |
 
-Paper Table 8 lists the no-consistency control as 3.897M/8.76G and Full as 3.942M/8.82G. Section 4.9 states that the stored no-consistency record used incompatible resource counts, so Table 17 omits that deployment row. Because consistency is training-only, the two variants have the same deployed graph in the open-source implementation.
+Manuscript Table 9 lists the no-consistency control as 3.897M/8.76G and Full as 3.942M/8.82G. Section 4.9 states that the stored no-consistency record used incompatible resource counts, so Table 18 omits that deployment row. Because consistency is training-only, the two variants have the same deployed graph in the open-source implementation.
 
 ### 12.2 Open-source implementation measurements
 
@@ -601,6 +604,7 @@ from scratch
 SGD lr=0.005, momentum=0.937, weight_decay=5e-4
 warmup=3 epochs
 source batch=16, clean/degraded pair=1:1
+relative GSD=1 for both paired views; no resolution resampling in training
 Mosaic p=1 for epochs 1-180, disabled for final 20
 seeds={2023,2024,2025}
 eta=1, tau=1, K=4
@@ -612,7 +616,9 @@ The repository CLI enables AMP by default, sets `deterministic=True`, uses eight
 
 See the root [`REPRODUCIBILITY.md`](../REPRODUCIBILITY.md) for the full augmentation schedule and commands.
 
-### 13.3 controlled grid
+Paired training uses Gaussian blur, Poisson noise, and joint blur-noise modes. Resolution resampling appears only in controlled evaluation and held-out robustness tests.
+
+### 13.3 Controlled grid
 
 ```text
 relative GSD = {1,2,3}
@@ -649,9 +655,9 @@ These definitions make every newly generated OOD run deterministic for a recorde
 
 ## 14. Statistical evidence and claim boundaries
 
-### 14.1 Table 16 uncertainty summary
+### 14.1 Table 17 uncertainty summary
 
-Paper Table 16 compares PIR-SBFR Full with the internal visual-only baseline on DIOR. Seed-paired intervals estimate training-run variation over the three common seeds, while image-paired bootstrap intervals estimate test-sample variation for a fixed contrast.
+Manuscript Table 17 compares PIR-SBFR Full with the internal visual-only baseline on DIOR. Seed-paired intervals estimate training-run variation over the three common seeds, while image-paired bootstrap intervals estimate test-sample variation for a fixed contrast.
 
 | Metric | Mean change | Seed-paired 95% CI | Paired p | Bootstrap 95% CI | Bootstrap p |
 |---|---:|---:|---:|---:|---:|
@@ -660,22 +666,22 @@ Paper Table 16 compares PIR-SBFR Full with the internal visual-only baseline on 
 | AP75 | +3.08 | [0.87, 5.29] | 0.0268 | [2.07, 4.15] | 0.0013 |
 | `AP_S` | +3.53 | [1.16, 5.90] | 0.0236 | [2.51, 4.59] | 0.0007 |
 
-Paper Figure 9 reports positive AP50 changes for 17 of the 20 DIOR categories. Dam and bridge have the largest gains (+11.15 and +9.18 points); airplane, stadium, and storage tank change by -0.17, -0.11, and -0.43 points. The aggregate gain is broad but not universal across categories.
+Manuscript Figure 9 reports positive AP50 changes for 17 of the 20 DIOR categories. Dam and bridge have the largest gains (+11.15 and +9.18 points); airplane, stadium, and storage tank change by -0.17, -0.11, and -0.43 points. The aggregate gain is broad but not universal across categories.
 
-### 14.2 Table 18 claim-evidence-boundary map
+### 14.2 Table 19 claim-evidence-boundary map
 
 | Evidence block | Supported interpretation | Boundary |
 |---|---|---|
 | DIOR | effectiveness on a public benchmark with broad object scales | native-telemetry use and transfer to another sensor are not tested |
 | AI-TOD-v2 | effectiveness on a second dataset in the tiny-object regime | platform-independent and multi-sensor generalization are not established |
 | Paired 2 × 2 ablation | separate scale-supervision, P5-bypass, and interaction effects | remaining losses and reliability terms are not independently factorized |
-| 27-condition grid | directional consistency across controlled GSD, MTF, and SNR changes | calibrated atmospheric, optical, and radiometric modeling is not evaluated |
+| 27-condition grid | directional consistency across controlled GSD, MTF, and SNR changes | calibrated atmospheric, optical, radiometric, or end-to-end sensor-response modeling is not evaluated |
 | Held-out operators and metadata controls | robustness beyond fitted operators and dependence on correctly paired descriptors | sensor-level causality and coverage of all natural degradations are not established |
 | Eight UAV videos | within-platform transfer across flights and unseen heights | transfer across cameras, payloads, and acquisition platforms is not tested |
 
 ## 15. Boundaries of the non-redistributed flight experiment
 
-The paper's flight collection contains eight complete videos, altitudes from 5.2 to 30.0 m, 5,370 annotated frames, and 38,947 instances. It is not a public benchmark. The paper's Data Availability Statement says that distribution is restricted by the data-providing institution.
+The manuscript's flight collection contains eight complete videos, altitudes from 5.2 to 30.0 m, 5,370 annotated frames, and 38,947 instances. It is not a public benchmark. The manuscript's Data Availability Statement says that distribution is restricted by the data-providing institution.
 
 Relative GSD is obtained from attitude-corrected slant range:
 
@@ -683,23 +689,23 @@ Relative GSD is obtained from attitude-corrected slant range:
 g=\frac{H/\cos\theta}{H_{ref}/\cos\theta_{ref}}
 \]
 
-MTF/PSF and SNR are not recorded, so their masks must be zero and must not be inferred from labels or imagery. The numerical values in Tables 14/15 are the authoritative paper record; the open-source implementation preserves the inference API and missing-field logic but does not redistribute the private videos, annotations, or telemetry needed to rerun those tables.
+MTF/PSF and SNR are not recorded, so their masks must be zero and must not be inferred from labels or imagery. The numerical values in Tables 15/16 are the authoritative manuscript record; the open-source implementation preserves the inference API and missing-field logic but does not redistribute the private videos, annotations, or telemetry needed to rerun those tables.
 
 ## 16. External implementations and references
 
-Base code repository directly cited by the paper:
+Base code repository directly cited by the manuscript:
 
 - Jocher, G.; Qiu, J. *Ultralytics YOLO11, Version 11.0.0* (2024): `https://github.com/ultralytics/ultralytics`
 
-The same repository is also used for the paper's YOLOv8 citation. This repository contains the open-source PIR-SBFR implementation. Model weights and training checkpoints, including internal-baseline checkpoints, cannot be publicly distributed under the institutional regulations governing this work.
+The same repository is also used for the manuscript's YOLOv8 citation. This repository contains the open-source PIR-SBFR implementation. Model weights and training checkpoints, including public-benchmark-only and internal-baseline checkpoints, cannot be publicly distributed under the institutional model-artifact release policy governing this work; this is separate from the private-flight data restriction.
 
 Related method references:
 
-- *Multi-Scale Context Aggregation by Dilated Convolutions*: dilation background for DRFB; the paper provides no DOI or code URL.
-- *Deep Residual Learning for Image Recognition*: identity/residual background for DRFB; the paper provides no DOI or code URL.
-- *Dynamic Convolution: Attention over Convolution Kernels*, *Dynamic Head*, and *TOOD*: dynamic-coupling background for FACH; the paper provides no code URL.
+- *Multi-Scale Context Aggregation by Dilated Convolutions*: dilation background for DRFB; the manuscript provides no DOI or code URL.
+- *Deep Residual Learning for Image Recognition*: identity/residual background for DRFB; the manuscript provides no DOI or code URL.
+- *Dynamic Convolution: Attention over Convolution Kernels*, *Dynamic Head*, and *TOOD*: dynamic-coupling background for FACH; the manuscript provides no code URL.
 - GSDDet: DOI `10.1109/TGRS.2023.3309838`.
 - FiLM: DOI `10.1609/aaai.v32i1.11671`.
 - AI-TOD-v2: DOI `10.1016/j.isprsjprs.2022.06.002`.
 
-The paper PDF and this open-source repository are complementary release artifacts. The included `scripts/bootstrap_paired_coco.py` implements the documented image-paired evaluation protocol, while the source tree and configurations define the executable details.
+The manuscript PDF and this open-source repository are complementary release artifacts. The included `scripts/bootstrap_paired_coco.py` implements the documented image-paired evaluation protocol, while the source tree and configurations define the executable details.

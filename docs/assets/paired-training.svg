@@ -14,7 +14,7 @@
   <rect width="1600" height="780" rx="28" fill="url(#bg2)"/>
   <circle cx="1450" cy="80" r="220" fill="#9c55ff" opacity="0.08"/>
   <text x="78" y="80" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" font-weight="700">Paired Degradation Training</text>
-  <text x="78" y="120" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21">Both views share geometry, labels, and model parameters; only the physical degradation changes.</text>
+  <text x="78" y="120" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21">Both views share geometry, labels, model parameters, and reference GSD; only blur and noise change.</text>
 
   <g filter="url(#shadow2)">
     <rect x="65" y="276" width="205" height="145" rx="23" fill="#152b49" stroke="#4e92ea" stroke-width="2"/>
@@ -47,7 +47,7 @@
     <rect x="730" y="438" width="260" height="170" rx="23" fill="#49301d" stroke="#ffad55" stroke-width="2"/>
     <text x="860" y="485" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="25" font-weight="700">Degraded view</text>
     <text x="860" y="520" text-anchor="middle" fill="#ffd6a0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">Gaussian PSF · Poisson noise</text>
-    <text x="860" y="550" text-anchor="middle" fill="#ffd6a0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">sampling · metadata dropout</text>
+    <text x="860" y="550" text-anchor="middle" fill="#ffd6a0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="17">GSD = 1 · metadata dropout</text>
     <text x="860" y="581" text-anchor="middle" fill="#c99869" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">deterministic per sample / epoch</text>
   </g>
 

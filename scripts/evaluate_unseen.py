@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evaluate the nine held-out imaging conditions reported in paper Table 13.
+"""Evaluate the nine held-out imaging conditions reported in manuscript Table 14.
 
 The public implementation fixes the scalar MTF/SNR conversion used for
 non-MTF PSFs and non-Poisson noise. The eight single-family conditions follow

@@ -1,29 +1,29 @@
 # PIR-SBFR Reproducibility Protocol
 
-This document provides a complete execution path from public-data preparation and three-seed training through evaluation, paired bootstrap analysis, and deployment-efficiency calibration. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) for the equation-by-equation mapping between the paper and the open-source implementation.
+This document provides a complete execution path from public-data preparation and three-seed training through evaluation, paired bootstrap analysis, and deployment-efficiency calibration for *PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing*. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) for the equation-by-equation mapping between the current manuscript and the open-source implementation.
 
 ## 1. Protocol scope
 
 Interpret results and experiment records using three distinct categories:
 
-- **Paper-level definition:** a formula, value, data split, result, or test procedure stated in the PIR-SBFR paper.
-- **Open-source implementation definition:** a release-level architectural, numerical, or execution detail fixed by this repository where the paper presents a higher-level description.
+- **Manuscript-level definition:** a formula, value, data split, result, or test procedure stated in the current PIR-SBFR manuscript.
+- **Open-source implementation definition:** a release-level architectural, numerical, or execution detail fixed by this repository where the manuscript presents a higher-level description.
 - **External artifact boundary:** an experiment that depends on data or a per-sample realization that is not redistributed in the public repository.
 
-This repository is the **open-source implementation of PIR-SBFR**. The paper and source code are complementary: the paper defines the method and reports the experiments, while this repository defines the release-level network topology, framework settings, executable configurations, and numerical conventions. The DIOR and AI-TOD-v2 experiments can be rerun from the public code and datasets using the protocol below.
+This repository is the **open-source implementation of PIR-SBFR**. The manuscript and source code are complementary: the manuscript defines the method and reports the experiments, while this repository defines the release-level network topology, framework settings, executable configurations, and numerical conventions. The DIOR and AI-TOD-v2 experiments can be rerun from the public code and datasets using the protocol below.
 
 Two reported evaluations depend on artifacts that are not redistributed:
 
 - **Real flight experiments:** the eight videos, annotations, and synchronized altitude/attitude/IMU records remain private research data.
-- **Archived joint OOD realization:** the paper reports "2.5x sampling + unseen PSF + unseen noise," but the exact per-image PSF realization used for the reported table is not included in the repository.
+- **Archived joint OOD realization:** the manuscript reports "2.5x sampling + unseen PSF + unseen noise," but the exact per-image PSF realization used for the reported table is not included in the repository.
 
-Pretrained weights and training checkpoints are a separate restricted release artifact. They cannot be publicly distributed under the institutional regulations governing this work. All commands below therefore use checkpoints produced by local training runs; the documented three-seed protocol is the supported path for obtaining them.
+Pretrained weights and training checkpoints are a separate restricted release artifact. The institutional model-artifact release policy prevents public distribution of all checkpoints, including those trained only on DIOR or AI-TOD-v2. This restriction is independent of the data-providing institution's restriction on private flight videos and telemetry. All commands below therefore use checkpoints produced by local training runs; the documented three-seed protocol is the supported path for obtaining them.
 
 The mixed-degradation metadata-control images and their per-image manifest are also not redistributed. The included scripts provide deterministic protocol-equivalent generation paths for new evaluations, but a newly generated sample set should not be presented as the archived sample set used for the paper's numerical table.
 
 ## 2. Environment
 
-The paper reports Ubuntu 22.04, CUDA 12.8, PyTorch 2.8.0, and one 24 GB RTX 4090D for training; efficiency tests use an RTX 4090. This repository pins PyTorch 2.8.0, torchvision 0.23.0, and Ultralytics 8.3.0.
+The manuscript reports Ubuntu 22.04, CUDA 12.8, PyTorch 2.8.0, and one 24 GB RTX 4090D for training; efficiency tests use an RTX 4090. This repository pins PyTorch 2.8.0, torchvision 0.23.0, and Ultralytics 8.3.0.
 
 Python 3.11 is recommended:
 
@@ -40,7 +40,7 @@ Check package versions and CUDA availability:
 python -c "import torch, ultralytics; print(torch.__version__, torch.version.cuda, ultralytics.__version__); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 ```
 
-The paper identifies the baseline as "Ultralytics YOLO11, Version 11.0.0." The open-source implementation standardizes the executable dependency on `ultralytics==8.3.0`, the Python package release containing the YOLO11 modules used by this repository.
+The manuscript identifies the baseline as "Ultralytics YOLO11, Version 11.0.0." The open-source implementation standardizes the executable dependency on `ultralytics==8.3.0`, the Python package release containing the YOLO11 modules used by this repository.
 
 ## 3. Data preparation
 
@@ -164,13 +164,13 @@ The included `PairedDegradationGenerator` shares one field-level dropout mask ac
 
 The repository RNG key uses the dataloader-provided `im_file` string, usually an absolute path. Moving or renaming the dataset root therefore changes the degradation sequence, so all three seeds and model comparisons must use the same normalized dataset path.
 
-The paper fixes the image-formation order as sampling, blur, then shot noise:
+For controlled evaluation and held-out robustness tests, the manuscript fixes the image-formation order as sampling, blur, then shot noise:
 
 1. Relative GSD `r`: antialiased bicubic downsampling to `round(640/r)`, followed by bicubic restoration to 640.
 2. Gaussian PSF: `sigma = sqrt(-2*log(mtf))/pi`, with kernel width `2*ceil(3*sigma)+1`.
 3. Poisson shot noise: `lambda = mean(x)*10^(snr/10)/mean(x^2)`, output `Poisson(lambda*x)/lambda`, clipped to `[0,1]`.
 
-Controlled and OOD transforms remain `float32 [0,1]` from this point to the model tensor and are never round-trip quantized to uint8. Source images retain their native precision only during decoding.
+Controlled and OOD transforms remain `float32 [0,1]` from this point to the model tensor and are never round-trip quantized to uint8. Source images retain their native precision only during decoding. Sampling is not part of paired training: both training views retain relative GSD `1`, and the degraded view applies only Gaussian blur, Poisson noise, or their joint mode.
 
 ### 4.3 Fixed routing and loss values
 
@@ -208,14 +208,14 @@ The full model reads `configs/pir_sbfr.yaml` by default. Pass a public ablation 
 ```bash
 pir-train \
   --data configs/datasets/dior.yaml \
-  --config configs/ablations/a6_analytic_all.yaml \
+  --config configs/ablations/a5_analytic_combined.yaml \
   --scale-mode dior \
   --seed 2023
 ```
 
-`configs/ablations/` provides the public configurations for A0, A1, A2, A3, A4, A5, A6, A9, and A10. A7 direct concatenation and A8 FiLM are reported comparison controls but are not exposed as standalone YAML configurations in this release. A2 retains A1's paired degradation and adds scale supervision plus the P5 bypass, matching its role in Tables 10 and 11.
+`configs/ablations/` provides standalone public configurations for A0, A1, A2, A3, A4, A5, A8, and A9. A6 metadata concatenation and A7 Metadata-FiLM are manuscript-reported comparison controls; no standalone configuration is currently distributed for either. A2 retains A1's paired degradation and adds scale supervision plus the P5 bypass, matching its role in manuscript Tables 11 and 12. A single-field GSD training ablation is not defined because relative GSD remains at the reference value `1` throughout paired training.
 
-Table 11's paired 2 × 2 experiment uses the four configurations under `configs/ablations/factorial/`:
+Table 12's paired 2 × 2 experiment uses the four configurations under `configs/ablations/factorial/`:
 
 | Cell | Configuration | Scale supervision | P5 bypass | AP | `AP_S` | `AP_L` |
 |---|---|---:|---:|---:|---:|---:|
@@ -283,7 +283,9 @@ The metadata JSON uses an absolute path, file name, or stem as each key and a de
 }
 ```
 
-When `availability` is omitted, the CLI derives the mask from the presence of `gsd/mtf/snr` keys. An image with no record receives reference values and an all-zero mask. The model tensor interface is fixed as `metadata=[gsd, mtf_or_psf_sharpness, snr_db]` plus an identically shaped `availability`. Missing fields must be marked with the mask; never use a zero value as a fake valid measurement. When all three fields are missing, the physical prior is `[1,1,1]` and the model reduces to visual routing.
+When `availability` is omitted, the CLI derives the mask from the presence of `gsd/mtf/snr` keys. An image with no record receives reference values and an all-zero mask. The model tensor interface is fixed as `metadata=[gsd, mtf_or_psf_sharpness, snr_db]` plus an identically shaped `availability`. Missing fields must be marked with the mask; never use a zero value as a fake valid measurement. When all three fields are missing, the analytic reliability prior is `[1,1,1]` and the model reduces to visual routing.
+
+DIOR and AI-TOD-v2 do not provide native acquisition telemetry; their GSD/MTF/SNR values in controlled tests are proxy descriptors generated by the evaluation protocol. In the private UAV study, relative GSD is derived from recorded flight height and attitude, while unavailable MTF/PSF and SNR fields use zero availability masks. MTF/PSF is a sharpness-related descriptor, not a complete laboratory-calibrated camera MTF curve. The analytic prior is therefore calibration-free and monotonic, not an end-to-end calibrated sensor-response model.
 
 ### 6.2 COCO-style evaluation
 
@@ -377,7 +379,7 @@ python scripts/bootstrap_paired_coco.py \
 
 The paper uses 10,000 replicates, seed `20260718`, and a 2.5%/97.5% percentile interval. Flight experiments resample complete videos rather than frames, but the source flight data is not public.
 
-Paper Table 16 reports the following DIOR contrasts against the internal visual-only baseline:
+Manuscript Table 17 reports the following DIOR contrasts against the internal visual-only baseline:
 
 | Metric | Mean change | Seed-paired 95% CI | Paired p | Bootstrap 95% CI | Bootstrap p |
 |---|---:|---:|---:|---:|---:|
@@ -484,7 +486,7 @@ python scripts/metadata_controls.py \
   --output-dir output/metadata_controls/seed2023
 ```
 
-When the non-redistributed mixed set is unavailable, pass `--synthesize-controlled` to construct a deterministic control surrogate labelled with `surrogate_input=true`. The script covers Table 12's correct descriptors, +/-10/20/50% multiplicative errors, 25/50/100% missingness, training-set mean, and cross-image shuffling. It reports only within-set differences relative to the correct condition and does not present generated samples as the archived samples behind the paper table.
+When the non-redistributed mixed set is unavailable, pass `--synthesize-controlled` to construct a deterministic control surrogate labelled with `surrogate_input=true`. The script covers Table 13's correct descriptors, +/-10/20/50% multiplicative errors, 25/50/100% missingness, training-set mean, and cross-image shuffling. It reports only within-set differences relative to the correct condition and does not present generated samples as the archived samples behind the manuscript table.
 
 ## 8. Parameter, GFLOP, and latency calibration
 
@@ -534,7 +536,7 @@ An Ultralytics trainer checkpoint contains a pickled model object. Use `--allow-
 
 The timing includes only the network forward and excludes disk access, image decoding, resize, host-to-device transfer, NMS, and serialization. Latency measured on different GPUs, power limits, drivers, or clock states should not be compared directly with the paper's RTX 4090 value.
 
-## 9. Claim boundaries from paper Table 18
+## 9. Claim boundaries from manuscript Table 19
 
 The experiment suite supports bounded conclusions. Reports generated with this repository must preserve the paper's distinction between supported evidence and claims outside the study design.
 
@@ -543,7 +545,7 @@ The experiment suite supports bounded conclusions. Reports generated with this r
 | DIOR | effectiveness on a public benchmark with broad object scales | native-telemetry use and transfer to another sensor are not tested |
 | AI-TOD-v2 | effectiveness on a second dataset in the tiny-object regime | platform-independent and multi-sensor generalization are not established |
 | Paired 2 × 2 ablation | separate scale-supervision, P5-bypass, and interaction effects under one protocol | remaining losses and reliability terms are not independently factorized |
-| 27-condition grid | directional consistency across controlled GSD, MTF, and SNR changes | calibrated atmospheric, optical, and radiometric modeling is not evaluated |
+| 27-condition grid | directional consistency across controlled GSD, MTF, and SNR changes | calibrated atmospheric, optical, radiometric, or end-to-end sensor-response modeling is not evaluated |
 | Held-out operators and metadata controls | robustness beyond fitted operators and dependence on correctly paired descriptors | sensor-level causality and coverage of all natural degradations are not established |
 | Eight UAV videos | within-platform transfer across flights and unseen heights using recorded context | transfer across cameras, payloads, and acquisition platforms is not tested |
 

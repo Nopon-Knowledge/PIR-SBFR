@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Paper-reported cross-dataset accuracy and efficiency results</title>
+  <title id="title">Manuscript-reported cross-dataset accuracy and efficiency results</title>
   <desc id="desc">Grouped bars compare YOLOv11n, the internal visual-only baseline, and PIR-SBFR on DIOR and AI-TOD-v2. A scatter plot shows DIOR AP versus GFLOPs for four efficiency-tested variants.</desc>
   <defs>
     <linearGradient id="paperBg" x1="0" y1="0" x2="1" y2="1">
@@ -12,8 +12,8 @@
   </defs>
   <rect width="1600" height="900" rx="28" fill="url(#paperBg)"/>
   <circle cx="1450" cy="80" r="230" fill="#7957ff" opacity="0.08"/>
-  <text x="70" y="72" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" font-weight="700">Paper-reported results</text>
-  <text x="70" y="111" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Accuracy: Tables 6 and 7. Resources: Table 17. Higher AP is better.</text>
+  <text x="70" y="72" fill="#ffffff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" font-weight="700">Manuscript-reported results</text>
+  <text x="70" y="111" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="20">Accuracy: Tables 7 and 8. Resources: Table 18. Higher AP is better.</text>
 
   <g filter="url(#paperShadow)">
     <rect x="55" y="145" width="780" height="675" rx="24" fill="#101f37" stroke="#294563" stroke-width="2"/>
@@ -105,5 +105,5 @@
     <text x="1270" y="239" fill="#e6fffb" font-size="16" font-weight="700">PIR-SBFR Full</text>
     <text x="1270" y="266" fill="#62d8c9" font-size="15">65.52 AP at 8.82 GFLOPs</text>
   </g>
-  <text x="70" y="862" fill="#7189ad" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">Values are reported by the paper and are not measurements from the randomly initialized repository model.</text>
+  <text x="70" y="862" fill="#7189ad" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">Values are reported by the current manuscript, not measured from the randomly initialized repository model.</text>
 </svg>

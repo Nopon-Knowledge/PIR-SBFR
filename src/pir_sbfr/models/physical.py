@@ -1,4 +1,4 @@
-"""Analytic physical-imaging reliability prior from paper equations (7), (9)-(11)."""
+"""Image-formation-informed analytic reliability prior from manuscript equations (7), (9)-(11)."""
 
 from __future__ import annotations
 
@@ -9,9 +9,10 @@ from torch import Tensor, nn
 
 
 class PhysicalReliabilityPrior(nn.Module):
-    """Map GSD, Nyquist MTF/PSF sharpness and SNR to P3-P5 reliability.
+    """Map GSD, MTF/PSF sharpness, and SNR to P3-P5 analytic reliability.
 
-    The module deliberately has no trainable parameters. Missing descriptor values are
+    This calibration-free monotonic module deliberately has no trainable parameters.
+    Missing descriptor values are
     replaced by their reference values *before* nonlinear transforms are evaluated,
     then removed with the availability mask. This prevents invalid placeholders (for
     example, a missing GSD encoded as zero) from generating NaNs before masking.

@@ -11,7 +11,7 @@
   <circle cx="170" cy="60" r="220" fill="#188ed8" opacity="0.07"/>
   <circle cx="1450" cy="700" r="280" fill="#a64ed9" opacity="0.07"/>
   <text x="78" y="80" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="42" font-weight="700">Reproducibility &amp; Experiment Suite</text>
-  <text x="78" y="120" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21">From a trained checkpoint to paper-aligned metrics, stress tests, uncertainty, and deployment measurements.</text>
+  <text x="78" y="120" fill="#9fb5d5" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="21">From a trained checkpoint to manuscript-aligned metrics, stress tests, uncertainty, and deployment measurements.</text>
 
   <g filter="url(#s3)">
     <rect x="70" y="250" width="260" height="255" rx="25" fill="#142841" stroke="#547ba9" stroke-width="2"/>
@@ -38,7 +38,7 @@
 
   <g filter="url(#s3)">
     <rect x="855" y="155" width="290" height="130" rx="22" fill="#123b4e" stroke="#3bc6d9" stroke-width="2"/>
-    <text x="1000" y="199" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" font-weight="700">Paper-aligned COCO</text>
+    <text x="1000" y="199" text-anchor="middle" fill="#fff" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" font-weight="700">Manuscript-aligned COCO</text>
     <text x="1000" y="232" text-anchor="middle" fill="#9ee6ed" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16">DIOR / AI-TOD-v2 scale bins</text>
     <text x="1000" y="258" text-anchor="middle" fill="#72b6c0" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15">AP · AP50 · AP75 · AR</text>
   </g>
