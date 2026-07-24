@@ -10,7 +10,7 @@ from pir_sbfr.data.degradations import (
 )
 
 
-def test_paired_sampling_is_deterministic_and_in_range():
+def test_paired_degradation_is_deterministic_and_keeps_reference_gsd():
     images = torch.rand(4, 3, 32, 32)
     generator = PairedDegradationGenerator(seed=2023)
     first = generator(images, ["a", "b", "c", "d"], epoch=7)
@@ -18,6 +18,8 @@ def test_paired_sampling_is_deterministic_and_in_range():
     assert first.modes == second.modes
     assert torch.equal(first.degraded, second.degraded)
     assert torch.equal(first.availability, second.availability)
+    torch.testing.assert_close(first.metadata_clean[:, 0], torch.ones(4))
+    torch.testing.assert_close(first.metadata_degraded[:, 0], torch.ones(4))
     assert 0.0 <= float(first.degraded.min()) <= float(first.degraded.max()) <= 1.0
 
 

@@ -3,6 +3,8 @@ model:
   lambda_scale: 0.0
   lambda_consistency: 0.0
   router:
+    # Combined analytic route; training supplies reference GSD=1, so only
+    # available blur/noise descriptors vary in the paired training protocol.
     physical_fields: [1.0, 1.0, 1.0]
     use_physical: true
     use_visual: false

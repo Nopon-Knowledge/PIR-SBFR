@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this open-source implementation, please cite the current PIR-SBFR manuscript and archive the exact repository version used."
+title: "PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing"
+type: software
+version: 0.1.2
+date-released: 2026-07-24
+repository-code: "https://github.com/Nopon-Knowledge/PIR-SBFR"
+license: MIT
+authors:
+  - family-names: Wang
+    given-names: Zixin
+  - family-names: Liu
+    given-names: Jingchao
+  - family-names: Zhao
+    given-names: Zizheng
+  - family-names: Dong
+    given-names: Xiaoyu
+  - family-names: Xue
+    given-names: Zhirui
+  - family-names: Hu
+    given-names: Junhao
+  - family-names: Zhu
+    given-names: Chengxin
+keywords:
+  - aerial optical sensing
+  - object detection
+  - acquisition-aware perception
+  - multiscale feature routing
+  - aerial imagery

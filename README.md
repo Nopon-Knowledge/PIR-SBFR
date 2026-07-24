@@ -1,6 +1,6 @@
-# From Image Formation to Feature Routing: PIR-SBFR
+# PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing
 
-The open-source implementation of *PIR-SBFR for Observation-Constrained Multiscale Evidence Allocation in Optical Remote Sensing*.
+The open-source implementation of *PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing* for object detection in aerial optical sensing systems.
 
 ![Python 3.9–3.12](https://img.shields.io/badge/Python-3.9--3.12-3776AB?logo=python&logoColor=white)
 ![PyTorch 2.8.0](https://img.shields.io/badge/PyTorch-2.8.0-EE4C2C?logo=pytorch&logoColor=white)
@@ -8,19 +8,19 @@ The open-source implementation of *PIR-SBFR for Observation-Constrained Multisca
 [![CI](https://github.com/Nopon-Knowledge/PIR-SBFR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Nopon-Knowledge/PIR-SBFR/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
-**[Paper-to-code specification](docs/PAPER_SPEC.md) · [Reproducibility protocol](REPRODUCIBILITY.md)**
+**[Manuscript-to-code specification](docs/PAPER_SPEC.md) · [Reproducibility protocol](REPRODUCIBILITY.md)**
 
 ![PIR-SBFR architecture](docs/assets/pir-sbfr-architecture.svg)
 
-This repository implements the model, paired-degradation training procedure, complete loss, DIOR and AI-TOD-v2 data conversion, paper-specific COCO evaluation, robustness experiments, metadata controls, statistical analysis, and deployment-oriented efficiency benchmarks described in the original PIR-SBFR paper. The paper PDF is not redistributed in this repository.
+This repository implements the model, paired-degradation training procedure, complete loss, DIOR and AI-TOD-v2 data conversion, manuscript-specific COCO evaluation, robustness experiments, metadata controls, statistical analysis, and deployment-oriented efficiency benchmarks described in the current PIR-SBFR manuscript. The manuscript PDF is not redistributed in this repository.
 
 > [!IMPORTANT]
-> This is the **open-source implementation of PIR-SBFR**. It contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices used for the public release. Dataset files, the paper PDF, and private flight data are not redistributed. Pretrained weights and training checkpoints **cannot be publicly released under the institutional regulations governing this work**. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
+> This is the **open-source implementation of PIR-SBFR**. It connects recorded or controlled acquisition descriptors to sensing-condition-informed multiscale feature routing. The source release contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices. Public benchmark datasets remain available from their original providers; the private flight videos, annotations, and telemetry cannot be redistributed under the data-providing institution's restrictions. Separately, pretrained weights and training checkpoints—including those trained only on public benchmarks—cannot be publicly released under the institutional model-artifact release policy governing this work. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
 
 ## Table of contents
 
 - [Implementation at a glance](#implementation-at-a-glance)
-- [Paper-reported results](#paper-reported-results)
+- [Manuscript-reported results](#manuscript-reported-results)
 - [Method overview](#method-overview)
 - [What is implemented](#what-is-implemented)
 - [Installation](#installation)
@@ -44,15 +44,15 @@ This repository implements the model, paired-degradation training procedure, com
 | Component | Status | Implementation |
 | --- | --- | --- |
 | PIR-SBFR detector | Complete | YOLO11n-style backbone, DRFB, dual-source router, FPN-PAN, P5 bypass, FACH, YOLO11 Detect |
-| Physical reliability prior | Complete | Parameter-free GSD, Nyquist MTF, and SNR mapping with field-level availability masks |
+| Analytic reliability prior | Complete | Calibration-free monotonic GSD, MTF/PSF-sharpness, and SNR mapping with field-level availability masks |
 | Visual residual router | Complete | `K=4` residual experts, learned expert gate, scale supervision, and logit-space fusion |
-| Paired degradation training | Complete | Aligned clean/degraded views, Gaussian PSF, Poisson noise, sampling degradation, metadata dropout |
+| Paired degradation training | Complete | Aligned clean/degraded views, Gaussian PSF, Poisson noise, joint blur-noise modes, reference GSD, metadata dropout |
 | Training objective | Complete | YOLO detection loss, scale KL, and shared-positive class/box consistency |
 | Dataset conversion | Complete | DIOR VOC and AI-TOD-v2 COCO to YOLO, COCO ground truth, category mapping, and audit report |
-| Paper-aligned evaluation | Complete | COCOeval with dataset-specific scale intervals and maximum-detection limits |
+| Manuscript-aligned evaluation | Complete | COCOeval with dataset-specific scale intervals and maximum-detection limits |
 | Robustness experiments | Complete | 27-cell grid, nine held-out OOD conditions, metadata controls, paired bootstrap |
 | Efficiency measurement | Complete | Parameter count, direct `640×640` FLOPs, and CUDA FP16 batch-1 forward latency |
-| Pretrained weights | Restricted | Cannot be publicly released under institutional regulations; train from scratch with the documented protocol |
+| Pretrained weights | Restricted | Public-benchmark and private-flight checkpoints are both restricted by the institutional model-artifact release policy; train from scratch with the documented protocol |
 
 ### Parameter and compute calibration
 
@@ -63,27 +63,27 @@ The default `nc=20` model was profiled by passing a real `640×640` tensor throu
 | Parameters | 3,944,613 | 3.942 M | approximately 0.07% |
 | FLOPs | 8.8353 G | 8.82 G | approximately 0.17% |
 
-This close agreement verifies that the released implementation matches the model scale reported in the paper.
+This close agreement verifies that the released implementation matches the model scale reported in the current manuscript.
 
-## Paper-reported results
+## Manuscript-reported results
 
 > [!NOTE]
-> These charts are original redraws of the current paper's Figure 5 and Tables 6, 7, 13, and 17; the observation-grid summary comes from Figure 8, and statistical intervals come from Table 16. All accuracy values are percentages and all deltas are percentage points. AP entries with uncertainty are three-seed means ± sample SD. These are published results, not measurements from the randomly initialized repository model.
+> These charts are original redraws of the current manuscript's Figure 5 and Tables 7, 8, 14, and 18; the observation-grid summary comes from Figure 8, and statistical intervals come from Table 17. All accuracy values are percentages and all deltas are percentage points. AP entries with uncertainty are three-seed means ± sample SD. These are results reported in the current manuscript, not measurements from the randomly initialized repository model.
 
-![Paper-reported accuracy and efficiency results](docs/assets/paper-results-overview.svg)
+![Manuscript-reported accuracy and efficiency results](docs/assets/paper-results-overview.svg)
 
 ### Benchmark accuracy
 
 | Dataset and metric | YOLOv11n | Internal visual-only baseline | PIR-SBFR Full | Delta vs. internal baseline | Source |
 | --- | ---: | ---: | ---: | ---: | --- |
-| DIOR AP | 57.31 ± 0.47 | 62.98 ± 0.43 | **65.52 ± 0.42** | **+2.54** | Table 6 |
-| DIOR `AP_S` | 38.64 | 44.08 | **47.61** | **+3.53** | Table 6 |
-| AI-TOD-v2 AP | 25.82 ± 0.37 | 29.61 ± 0.37 | **32.13 ± 0.36** | **+2.52** | Table 7 |
-| AI-TOD-v2 `AP_VT` | 10.84 | 14.62 | **17.22** | **+2.60** | Table 7 |
+| DIOR AP | 57.31 ± 0.47 | 62.98 ± 0.43 | **65.52 ± 0.42** | **+2.54** | Table 7 |
+| DIOR `AP_S` | 38.64 | 44.08 | **47.61** | **+3.53** | Table 7 |
+| AI-TOD-v2 AP | 25.82 ± 0.37 | 29.61 ± 0.37 | **32.13 ± 0.36** | **+2.52** | Table 8 |
+| AI-TOD-v2 `AP_VT` | 10.84 | 14.62 | **17.22** | **+2.60** | Table 8 |
 
 ### Deployment efficiency
 
-The paper measures forward-only FP16 inference with batch size 1 at `640 × 640` on an RTX 4090. Preprocessing, data transfer, NMS, and serialization are excluded.
+The manuscript measures forward-only FP16 inference with batch size 1 at `640 × 640` on an RTX 4090. Preprocessing, data transfer, NMS, and serialization are excluded.
 
 | Model | Params (M) | GFLOPs | Peak VRAM (GB) | FP16 size (MB) | Latency (ms) | FPS | DIOR AP |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -92,9 +92,9 @@ The paper measures forward-only FP16 inference with batch size 1 at `640 × 640`
 | Internal scaffold + scale supervision + P5 bypass | 3.691 | 8.51 | 0.872 | 7.41 | 3.117 | 320.8 | 63.69 |
 | **PIR-SBFR Full** | 3.942 | 8.82 | 0.903 | 7.90 | 3.313 | 301.8 | **65.52** |
 
-Relative to the internal visual-only baseline, PIR-SBFR Full adds 0.314 M parameters (+8.65%) and 0.39 GFLOPs (+4.63%). These values are reported in Table 17.
+Relative to the internal visual-only baseline, PIR-SBFR Full adds 0.314 M parameters (+8.65%) and 0.39 GFLOPs (+4.63%). These values are reported in Table 18.
 
-![Paper-reported robustness results](docs/assets/paper-robustness-results.svg)
+![Manuscript-reported robustness results](docs/assets/paper-robustness-results.svg)
 
 ### Held-out degradation robustness
 
@@ -111,11 +111,11 @@ Relative to the internal visual-only baseline, PIR-SBFR Full adds 0.314 M parame
 | Joint degradation | 29.60 | 36.97 | **+7.37** |
 | **Mean / worst** | **46.95 / 29.60** | **51.32 / 36.97** | **+4.37 / +7.37** |
 
-Table 13 reports positive gains for all nine held-out conditions. Figure 8 reports positive gains in all 27 cells of the controlled GSD-MTF-SNR grid, spanning +2.54 to +10.23 points with a mean gain of +7.66 points.
+Table 14 reports positive gains for all nine held-out conditions. Figure 8 reports positive gains in all 27 cells of the controlled GSD-MTF-SNR grid, spanning +2.54 to +10.23 points with a mean gain of +7.66 points.
 
 ### Statistical support
 
-Table 16 separates training-run uncertainty from test-sample uncertainty. Every reported interval excludes zero.
+Table 17 separates training-run uncertainty from test-sample uncertainty. Every reported interval excludes zero.
 
 | Metric | Mean change | Seed-paired 95% CI | Paired p | Bootstrap 95% CI | Bootstrap p |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -124,14 +124,14 @@ Table 16 separates training-run uncertainty from test-sample uncertainty. Every 
 | AP75 | **+3.08** | [0.87, 5.29] | 0.0268 | [2.07, 4.15] | 0.0013 |
 | `AP_S` | **+3.53** | [1.16, 5.90] | 0.0236 | [2.51, 4.59] | 0.0007 |
 
-Figure 9 reports positive class-wise AP50 changes for 17 of 20 DIOR categories. Table 18 bounds the conclusions to the tested public benchmarks, controlled observation grid, held-out operators, and one within-platform flight collection; it does not claim calibrated sensor physics or cross-platform generalization.
+Figure 9 reports positive class-wise AP50 changes for 17 of 20 DIOR categories. Table 19 bounds the conclusions to the tested public benchmarks, controlled observation grid, held-out operators, and one within-platform flight collection; it does not claim a calibrated end-to-end sensor-response model or cross-platform generalization.
 
 ## Method overview
 
 PIR-SBFR combines two complementary routing signals:
 
 1. A **visual residual router** reads global evidence from P3, P4, and P5 through four bounded residual experts.
-2. A **parameter-free physical prior** maps GSD, MTF, and SNR into per-scale reliability.
+2. A **calibration-free monotonic analytic reliability prior** maps GSD, MTF/PSF sharpness, and SNR into per-scale reliability.
 
 Their logits are fused before a softmax produces scale weights:
 
@@ -144,7 +144,7 @@ Their logits are fused before a softmax produces scale weights:
 
 Aligned pyramid features are reweighted as `3w_i · P_i`, processed by FPN-PAN and FACH, and passed to the native YOLO11 detection head. An unweighted P5 bypass preserves coarse structural information when acquisition quality is poor.
 
-### Physical reliability prior
+### Image-formation-informed analytic reliability prior
 
 For metadata `m = [GSD, MTF, SNR]`, the implementation first forms non-negative degradation coordinates relative to the reference condition `(1.0, 0.5, 30 dB)`. Reliability is then computed analytically:
 
@@ -154,6 +154,8 @@ For metadata `m = [GSD, MTF, SNR]`, the implementation first forms non-negative 
 ```
 
 The prior has no trainable parameters. Missing fields are replaced by safe reference values before nonlinear operations and then removed by their availability mask, preventing invalid placeholders from producing NaNs.
+
+Here, “physical” refers to the origin and monotonic organization of the acquisition constraints, rather than to a calibrated end-to-end sensor-response model. `MTF/PSF` is a sharpness-related descriptor and does not represent a complete laboratory-calibrated camera MTF curve.
 
 ### Multi-scale prediction path
 
@@ -169,10 +171,10 @@ The formula-to-code mapping is available in [`docs/PAPER_SPEC.md`](docs/PAPER_SP
 
 ### Model
 
-- YOLO11n-style P3/P4/P5 backbone with the paper-motivated DRFB placement.
+- YOLO11n-style P3/P4/P5 backbone with the manuscript-motivated DRFB placement.
 - Per-scale channel alignment before routing.
 - Four-expert bounded visual residual router.
-- Parameter-free GSD/MTF/SNR reliability prior.
+- Calibration-free monotonic GSD/MTF/PSF/SNR analytic reliability prior.
 - Temperature-controlled logit fusion and normalized scale weights.
 - `3w_i` feature reweighting and an optional unweighted P5 structural bypass.
 - FPN-PAN aggregation and dynamic FACH experts.
@@ -181,7 +183,7 @@ The formula-to-code mapping is available in [`docs/PAPER_SPEC.md`](docs/PAPER_SP
 ### Training
 
 - A clean/degraded 1:1 pair is created after shared image/label augmentation.
-- Gaussian PSF blur, Poisson shot noise, sampling degradation, and mixed modes.
+- Gaussian PSF blur, Poisson noise, and joint blur-noise modes; relative GSD is fixed at the reference value `1` for both paired views.
 - Deterministic degradation generation keyed by sample identity and epoch.
 - Field-level metadata dropout with a shared mask for the paired views.
 - Detection loss on both clean and degraded branches.
@@ -345,11 +347,13 @@ Inference and evaluation accept `--metadata metadata.json`. The top-level JSON o
 | Field | Meaning | Reference | Interpretation |
 | --- | --- | ---: | --- |
 | `gsd` | Relative GSD / sampling ratio | 1.0 | Larger values indicate coarser spatial sampling |
-| `mtf` | MTF at the Nyquist frequency | 0.5 | Smaller values indicate stronger blur |
+| `mtf` | MTF/PSF sharpness descriptor | 0.5 | Smaller values indicate stronger blur; not a complete calibrated camera MTF curve |
 | `snr` | Signal-to-noise ratio in dB | 30.0 | Smaller values indicate stronger noise |
 | `availability` | Field-availability mask | inferred | Fixed order: `[gsd, mtf, snr]` |
 
-If `availability` is omitted, it is inferred from the fields present in that record. If an image has no record, reference values `(1.0, 0.5, 30.0)` are supplied with a zero availability mask. The physical bias is then neutral while the visual router remains active.
+If `availability` is omitted, it is inferred from the fields present in that record. If an image has no record, reference values `(1.0, 0.5, 30.0)` are supplied with a zero availability mask. The analytic route is then neutral while the visual router remains active.
+
+Descriptor provenance differs by experiment. DIOR and AI-TOD-v2 use controlled proxy descriptors generated by the evaluation protocol; these datasets do not provide native acquisition telemetry. In the UAV study, relative GSD is derived from recorded flight height and attitude. UAV MTF/PSF and SNR are unavailable and therefore receive zero availability masks rather than inferred values.
 
 ## Training
 
@@ -417,10 +421,13 @@ pir-train \
 | Augmentation | Disabled transforms | vertical flip, rotation, shear, perspective, MixUp, Copy-Paste |
 | Paired degradation | Blur-only / noise-only / joint probabilities | 0.35 / 0.35 / 0.30 |
 | Paired degradation | MTF / SNR ranges | `[0.15, 0.45]` / `[10, 28]` dB |
+| Paired degradation | Relative GSD | fixed at reference value `1` for clean and degraded views |
 | PIR-SBFR | Metadata dropout | 0.25 independently per GSD/MTF/SNR field |
 | PIR-SBFR | Scale / consistency loss weights | 0.1 / 0.1 |
 
-The initial LR, warmup duration, optimizer, augmentation, and main seeds follow the paper protocol. Framework-level values not reported in the paper—such as the final LR ratio, warmup momentum, loss gains, AMP, and worker count—are pinned explicitly so future library defaults cannot silently alter a run. [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) records the complete protocol and distinguishes paper-reported values from implementation choices.
+The initial LR, warmup duration, optimizer, augmentation, and main seeds follow the manuscript protocol. Framework-level values not reported in the manuscript—such as the final LR ratio, warmup momentum, loss gains, AMP, and worker count—are pinned explicitly so future library defaults cannot silently alter a run. [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) records the complete protocol and distinguishes manuscript-reported values from implementation choices.
+
+Paired training does not resample image resolution: it uses blur-only, noise-only, and joint blur-noise modes with relative GSD fixed at `1`. Resolution resampling is reserved for the controlled GSD grid and held-out robustness evaluations.
 
 ### Run all three seeds
 
@@ -470,10 +477,10 @@ pir-predict \
 
 - input metadata and availability mask;
 - final P3/P4/P5 routing weights;
-- analytic physical reliability `rho_phy`;
+- image-formation-informed analytic reliability `rho_phy`;
 - visual-branch scale estimate.
 
-When `--metadata` is not supplied, the model uses its visual route and a neutral physical route, as described above.
+When `--metadata` is not supplied, the model uses its visual route and a neutral analytic route, as described above.
 
 ## COCO evaluation
 
@@ -555,17 +562,18 @@ All ablations inherit from the main configuration through a `base` field.
 
 | Configuration | Main change |
 | --- | --- |
-| `a0_visual_only.yaml` | Internal visual-only baseline; no physical prior, degradation, scale loss, P5 bypass, or consistency loss |
+| `a0_visual_only.yaml` | Internal visual-only baseline; no analytic prior, degradation, scale loss, P5 bypass, or consistency loss |
 | `a1_degradation_augmentation.yaml` | Adds paired degradation to A0 |
 | `a2_scale_p5.yaml` | A1 plus scale supervision and the P5 bypass |
-| `a3_gsd.yaml` | GSD-only analytic prior |
-| `a4_mtf.yaml` | MTF-only analytic prior |
-| `a5_snr.yaml` | SNR-only analytic prior |
-| `a6_analytic_all.yaml` | Full GSD/MTF/SNR analytic prior without the visual residual route |
-| `a9_no_consistency.yaml` | Complete dual-source route with consistency loss disabled |
-| `a10_full.yaml` | Full PIR-SBFR configuration |
+| `a3_mtf_psf.yaml` | MTF/PSF-only analytic prior |
+| `a4_snr.yaml` | SNR-only analytic prior |
+| `a5_analytic_combined.yaml` | Combined analytic route with GSD fixed at its reference value during paired training |
+| A6 | Metadata concatenation; manuscript-reported comparison control, no standalone configuration is currently distributed |
+| A7 | Metadata-FiLM; manuscript-reported comparison control, no standalone configuration is currently distributed |
+| `a8_analytic_visual.yaml` | Analytic prior plus visual residual, without consistency regularization |
+| `a9_full.yaml` | Full PIR-SBFR with consistency regularization |
 
-The paired 2 × 2 experiment in Table 11 is available under [`configs/ablations/factorial/`](configs/ablations/factorial/):
+The paired 2 × 2 experiment in Table 12 is available under [`configs/ablations/factorial/`](configs/ablations/factorial/):
 
 | Configuration | Scale supervision | P5 bypass | AP | `AP_S` | `AP_L` |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -582,9 +590,9 @@ Example ablation run:
 ```bash
 pir-train \
   --data datasets/DIOR/dataset.yaml \
-  --config configs/ablations/a9_no_consistency.yaml \
+  --config configs/ablations/a8_analytic_visual.yaml \
   --seed 2023 \
-  --name a9_no_consistency_seed2023 \
+  --name a8_analytic_visual_seed2023 \
   --device 0
 ```
 
@@ -619,12 +627,12 @@ python -m pip check
 
 The current test suite covers:
 
-- physical-prior reference behavior, monotonicity, and safe missing fields;
+- analytic-prior reference behavior, monotonicity, and safe missing fields;
 - normalized routing weights, P5 bypass, and optional routing branches;
 - sample/epoch deterministic degradation and metadata dropout;
 - scale loss, consistency loss, and full-model forward/backward passes;
 - letterbox coordinate restoration and single/batched inference;
-- paper-specific COCO metric protocols;
+- manuscript-specific COCO metric protocols;
 - converter validation, idempotence, and category mappings.
 
 The repository currently passes **23 tests**. See [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the full end-to-end validation checklist, three-seed aggregation, bootstrap protocol, and efficiency timing definition.
@@ -661,6 +669,7 @@ PIR-SBFR/
 │   ├── coco_inference.py
 │   └── inference.py
 ├── tests/                     Unit and integration smoke tests
+├── CITATION.cff               GitHub citation metadata and ordered author list
 ├── REPRODUCIBILITY.md         End-to-end reproducibility guide
 ├── requirements.txt           Pinned and bounded runtime dependencies
 └── pyproject.toml             Package metadata, dependencies, and CLI entry points
@@ -670,11 +679,11 @@ PIR-SBFR/
 
 This repository is the open-source implementation of PIR-SBFR. The released source code and configurations define the model architecture, training objective, metadata handling, dataset conversion, evaluation protocol, ablations, and robustness tools.
 
-The repository intentionally does not bundle third-party datasets, private flight imagery and metadata, or the paper PDF. Pretrained weights and training checkpoints cannot be publicly released under the institutional regulations governing this work. A regenerated joint OOD condition marked with `approximate=true` and metadata controls marked with `surrogate_input=true` must be distinguished from the non-redistributed archived evaluation inputs.
+The repository intentionally does not bundle third-party datasets, private flight imagery and metadata, or the manuscript PDF. Public benchmark data remain obtainable from their original providers. Private flight artifacts are restricted by the data-providing institution. Separately, the institutional model-artifact release policy prevents public distribution of all pretrained weights and training checkpoints, including DIOR/AI-TOD-v2-only checkpoints. A regenerated joint OOD condition marked with `approximate=true` and metadata controls marked with `surrogate_input=true` must be distinguished from the non-redistributed archived evaluation inputs.
 
 Public reports should clearly separate:
 
-1. numbers reported in the paper;
+1. numbers reported in the current manuscript;
 2. results produced by full training on the complete datasets with this repository;
 3. smoke-test, synthetic-surrogate, or regenerated-joint results.
 
@@ -685,14 +694,14 @@ Do not report random-initialization output, a tiny smoke dataset, a synthetic me
 <details>
 <summary><strong>Why are pretrained weights not included?</strong></summary>
 
-Pretrained weights and training checkpoints cannot be publicly released under the institutional regulations governing this work. They are therefore excluded from the repository and will not be provided through a separate public download. Train from scratch with the fixed three-seed protocol; locally generated checkpoints remain subject to the applicable institutional and dataset rules.
+Pretrained weights and training checkpoints cannot be publicly released under the institutional model-artifact release policy governing this work. This restriction applies independently of dataset provenance and therefore includes checkpoints trained only on DIOR or AI-TOD-v2; it is not inferred from the separate restriction on private flight data. Train from scratch with the fixed three-seed protocol; locally generated checkpoints remain subject to the applicable institutional and dataset rules.
 
 </details>
 
 <details>
 <summary><strong>Can the model run without acquisition metadata?</strong></summary>
 
-Yes. A missing record produces reference values with a zero availability mask. The physical route is neutral, while the visual residual route remains active. Training and formal controls should still record the metadata source and missing-field rate.
+Yes. A missing record produces reference values with a zero availability mask. The analytic route is neutral, while the visual residual route remains active. Training and formal controls should still record the metadata source and missing-field rate.
 
 </details>
 
@@ -719,10 +728,10 @@ At minimum: commit ID, dataset split and conversion report, GPU/CUDA information
 
 ## License and citation
 
-The open-source implementation code is released under the [MIT License](LICENSE). The paper, DIOR, AI-TOD-v2, Ultralytics, and all other third-party dependencies remain governed by their original licenses and terms.
+The open-source implementation code is released under the [MIT License](LICENSE). The manuscript, DIOR, AI-TOD-v2, Ultralytics, and all other third-party dependencies remain governed by their original licenses and terms. GitHub citation metadata is provided in [`CITATION.cff`](CITATION.cff).
 
 If this repository supports your research:
 
-1. cite Zizheng Zhao, Jingchao Liu, Zixin Wang, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *From Image Formation to Feature Routing: PIR-SBFR for Observation-Constrained Multiscale Evidence Allocation in Optical Remote Sensing*;
+1. cite Zixin Wang, Jingchao Liu, Zizheng Zhao, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing*;
 2. identify this repository as the open-source implementation;
 3. include the exact Git commit, configuration, dataset split, and training seeds used.

@@ -20,7 +20,7 @@ def test_router_outputs_and_normalization():
     torch.testing.assert_close(aux["rho_phy"], torch.ones(2, 3))
 
 
-def test_physical_only_degradation_moves_mass_from_p3():
+def test_analytic_only_degradation_moves_mass_from_p3():
     neck = PIRSBFRNeck(use_visual=False).eval()
     features = _pyramid(batch=1)
     with torch.no_grad():
