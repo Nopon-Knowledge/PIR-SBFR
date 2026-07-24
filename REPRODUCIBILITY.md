@@ -1,6 +1,6 @@
 # PIR-SBFR Reproducibility Protocol
 
-This document provides a complete execution path from public-data preparation and three-seed training through evaluation, paired bootstrap analysis, and deployment-efficiency calibration for *PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing*. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) for the equation-by-equation mapping between the current manuscript and the open-source implementation.
+This document provides a complete execution path from public-data preparation and three-seed training through evaluation, paired bootstrap analysis, and deployment-efficiency calibration for *PIR-SBFR: A Calibration-Free Sensor-to-Inference Routing Interface for Aerial Optical Object Detection*. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) for the equation-by-equation mapping between the current manuscript and the open-source implementation.
 
 ## 1. Protocol scope
 
