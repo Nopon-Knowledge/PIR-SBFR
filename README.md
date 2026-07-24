@@ -1,6 +1,6 @@
-# PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing
+# PIR-SBFR: A Calibration-Free Sensor-to-Inference Routing Interface for Aerial Optical Object Detection
 
-The open-source implementation of *PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing* for object detection in aerial optical sensing systems.
+The open-source implementation of *PIR-SBFR: A Calibration-Free Sensor-to-Inference Routing Interface for Aerial Optical Object Detection*.
 
 ![Python 3.9–3.12](https://img.shields.io/badge/Python-3.9--3.12-3776AB?logo=python&logoColor=white)
 ![PyTorch 2.8.0](https://img.shields.io/badge/PyTorch-2.8.0-EE4C2C?logo=pytorch&logoColor=white)
@@ -15,7 +15,7 @@ The open-source implementation of *PIR-SBFR: Image-Formation-Informed Multiscale
 This repository implements the model, paired-degradation training procedure, complete loss, DIOR and AI-TOD-v2 data conversion, manuscript-specific COCO evaluation, robustness experiments, metadata controls, statistical analysis, and deployment-oriented efficiency benchmarks described in the current PIR-SBFR manuscript. The manuscript PDF is not redistributed in this repository.
 
 > [!IMPORTANT]
-> This is the **open-source implementation of PIR-SBFR**. It connects recorded or controlled acquisition descriptors to sensing-condition-informed multiscale feature routing. The source release contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices. Public benchmark datasets remain available from their original providers; the private flight videos, annotations, and telemetry cannot be redistributed under the data-providing institution's restrictions. Separately, pretrained weights and training checkpoints—including those trained only on public benchmarks—cannot be publicly released under the institutional model-artifact release policy governing this work. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
+> This is the **open-source implementation of PIR-SBFR**. It connects recorded or controlled acquisition descriptors to sensing-condition-informed multiscale feature routing. The source release contains the model, training pipeline, evaluation tools, experiment configurations, and documented implementation choices. Public benchmark datasets remain available from their original providers; the private flight videos, annotations, and telemetry cannot be redistributed under the data-providing institution's restrictions. Model artifacts are governed by a separate institutional policy: pretrained weights and training checkpoints cannot be publicly released, including artifacts trained only on DIOR or AI-TOD-v2. See [`docs/PAPER_SPEC.md`](docs/PAPER_SPEC.md) and [`REPRODUCIBILITY.md`](REPRODUCIBILITY.md) for the implementation mapping and complete experiment protocol.
 
 ## Table of contents
 
@@ -363,8 +363,10 @@ The default optimization objective is:
 
 ```math
 \displaystyle
-\mathcal{L} = \mathcal{L}_{\mathrm{det}}^{\mathrm{clean}}
-  + \mathcal{L}_{\mathrm{det}}^{\mathrm{degraded}}
+\mathcal{L} = \frac{1}{2}\left(
+  \mathcal{L}_{\mathrm{det}}(I)
+  + \mathcal{L}_{\mathrm{det}}(I^{\prime})
+\right)
   + \lambda_{\mathrm{scale}}\mathcal{L}_{\mathrm{scale}}
   + \lambda_{\mathrm{cons}}\mathcal{L}_{\mathrm{cons}}
 ```
@@ -679,7 +681,7 @@ PIR-SBFR/
 
 This repository is the open-source implementation of PIR-SBFR. The released source code and configurations define the model architecture, training objective, metadata handling, dataset conversion, evaluation protocol, ablations, and robustness tools.
 
-The repository intentionally does not bundle third-party datasets, private flight imagery and metadata, or the manuscript PDF. Public benchmark data remain obtainable from their original providers. Private flight artifacts are restricted by the data-providing institution. Separately, the institutional model-artifact release policy prevents public distribution of all pretrained weights and training checkpoints, including DIOR/AI-TOD-v2-only checkpoints. A regenerated joint OOD condition marked with `approximate=true` and metadata controls marked with `surrogate_input=true` must be distinguished from the non-redistributed archived evaluation inputs.
+The repository intentionally does not bundle third-party datasets, private flight imagery and metadata, or the manuscript PDF. Public benchmark data remain obtainable from their original providers. Private flight artifacts are restricted by the data-providing institution. Model artifacts are a separate release boundary: the institutional model-artifact policy prevents public distribution of pretrained weights and training checkpoints, regardless of whether they were trained on public benchmarks or private flight data. A regenerated joint OOD condition marked with `approximate=true` and metadata controls marked with `surrogate_input=true` must be distinguished from the non-redistributed archived evaluation inputs.
 
 Public reports should clearly separate:
 
@@ -694,7 +696,7 @@ Do not report random-initialization output, a tiny smoke dataset, a synthetic me
 <details>
 <summary><strong>Why are pretrained weights not included?</strong></summary>
 
-Pretrained weights and training checkpoints cannot be publicly released under the institutional model-artifact release policy governing this work. This restriction applies independently of dataset provenance and therefore includes checkpoints trained only on DIOR or AI-TOD-v2; it is not inferred from the separate restriction on private flight data. Train from scratch with the fixed three-seed protocol; locally generated checkpoints remain subject to the applicable institutional and dataset rules.
+Pretrained weights and training checkpoints cannot be publicly released under the institutional model-artifact release policy governing this work. This policy is independent of dataset provenance and includes checkpoints trained only on DIOR or AI-TOD-v2. The private-flight data restriction is a separate data-availability constraint. Train from scratch with the fixed three-seed protocol; locally generated checkpoints remain subject to the applicable institutional and dataset rules.
 
 </details>
 
@@ -732,6 +734,6 @@ The open-source implementation code is released under the [MIT License](LICENSE)
 
 If this repository supports your research:
 
-1. cite Zixin Wang, Jingchao Liu, Zizheng Zhao, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing*;
+1. cite Zixin Wang, Jingchao Liu, Zizheng Zhao, Xiaoyu Dong, Zhirui Xue, Junhao Hu, and Chengxin Zhu, *PIR-SBFR: A Calibration-Free Sensor-to-Inference Routing Interface for Aerial Optical Object Detection*;
 2. identify this repository as the open-source implementation;
 3. include the exact Git commit, configuration, dataset split, and training seeds used.

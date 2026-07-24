@@ -1,6 +1,6 @@
 # PIR-SBFR Open-Source Implementation Specification
 
-This document maps the current Sensors manuscript, *PIR-SBFR: Image-Formation-Informed Multiscale Feature Routing*, to the open-source implementation. The manuscript PDF is not redistributed in this repository. The source code and configurations define release-level details that the manuscript summarizes rather than enumerates.
+This document maps the current Sensors manuscript, *PIR-SBFR: A Calibration-Free Sensor-to-Inference Routing Interface for Aerial Optical Object Detection*, to the open-source implementation. The manuscript PDF is not redistributed in this repository. The source code and configurations define release-level details that the manuscript summarizes rather than enumerates.
 
 ## 1. Implementation conclusions
 

@@ -2,7 +2,7 @@ model:
   scale_mode: dior
   lambda_scale: 0.1
   lambda_consistency: 0.1
-  fach_experts: 3  # K_h is not reported; selected by parameter/FLOP calibration
+  fach_experts: 3  # Fixed implementation setting.
   router:
     aligned_channels: 64
     num_experts: 4
